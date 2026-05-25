@@ -289,23 +289,29 @@ export default async function FestivalDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* 공식 웹사이트 아웃링크 - 프레스 스타일 버튼 */}
-              {festival.officialUrl ? (
-                <a
-                  href={festival.officialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-center space-x-1.5 w-full h-14 text-base font-bold rounded-lg cursor-pointer press-button shadow-md"
-                >
-                  <Link2 size={15} />
-                  <span>공식 기록 보러가기</span>
-                  <ExternalLink size={12} />
-                </a>
-              ) : (
-                <div className="flex items-center justify-center space-x-1.5 w-full h-14 bg-secondary/15 text-muted-foreground text-base font-bold rounded-lg border border-dashed border-border select-none">
-                  <span>공식 사이트 없음</span>
-                </div>
-              )}
+              {/* 공식 웹사이트 아웃링크 - 프레스 스타일 버튼 (더 정밀한 출처 상세 주소가 있으면 우선 연동) */}
+              {(() => {
+                // 더 정확하고 직접적인 지자체 공식 상세 출처(LOCAL_GOV 등)가 있으면 우선적으로 활용합니다.
+                const preciseSource = festival.sources.find(s => s.type === "LOCAL_GOV" || s.type === "VISIT_KOREA") || festival.sources[0];
+                const targetUrl = preciseSource?.url || festival.officialUrl;
+
+                return targetUrl ? (
+                  <a
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center space-x-2 w-full h-14 text-base font-bold rounded-xl cursor-pointer press-button shadow-md"
+                  >
+                    <Link2 size={16} className="shrink-0" />
+                    <span>공식 상세기록 보러가기</span>
+                    <ExternalLink size={12} className="shrink-0" />
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-center space-x-2 w-full h-14 bg-secondary/15 text-muted-foreground text-sm font-bold rounded-xl border border-dashed border-border select-none">
+                    <span>공식 사이트 정보 없음</span>
+                  </div>
+                );
+              })()}
 
               {/* 교차 검증 크롤러/제보 출처 */}
               <div className="space-y-3">
