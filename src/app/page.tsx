@@ -4,8 +4,9 @@ import { FestivalCard } from "@/components/festivals/FestivalCard";
 import { FestivalFilters } from "@/components/festivals/FestivalFilters";
 import { FestivalSearch } from "@/components/festivals/FestivalSearch";
 import { FestivalSort } from "@/components/festivals/FestivalSort";
-import { SlidersHorizontal, Map, Sparkles, Compass } from "lucide-react";
+import { Map, Compass } from "lucide-react";
 import { Suspense } from "react";
+import { Prisma } from "@prisma/client";
 
 export interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -27,7 +28,7 @@ export default async function Home({ searchParams }: PageProps) {
   const isChildFriendly = resolvedParams.child === "true";
 
   // --- Prisma Query 조건 조립 ---
-  const where: any = {
+  const where: Prisma.FestivalWhereInput = {
     status: "VERIFIED", // 일반 화면은 검수 완료된 건만 표시
   };
 
@@ -82,7 +83,7 @@ export default async function Home({ searchParams }: PageProps) {
   }
 
   // --- 정렬 조건 조립 ---
-  let orderBy: any = {};
+  let orderBy: Prisma.FestivalOrderByWithRelationInput = {};
   if (sort === "newest") {
     orderBy = { createdAt: "desc" };
   } else if (sort === "date") {

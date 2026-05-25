@@ -10,6 +10,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     // 1. 마운트 시 브라우저 설정 로드
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
     const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;

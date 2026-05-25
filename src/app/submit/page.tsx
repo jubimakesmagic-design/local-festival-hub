@@ -12,20 +12,28 @@ import {
   CheckCircle,
   FileText
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { submitFestivalAction } from "./actions";
 
 export default function SubmitFestivalPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    region: string;
+    address: string;
+    dateRange: string;
+    category: "FOOD" | "CULTURE" | "ART" | "MUSIC" | "NATURE" | "OTHER";
+    sourceUrl: string;
+    submitterEmail: string;
+    submitterContact: string;
+  }>({
     name: "",
     description: "",
     region: "",
     address: "",
     dateRange: "",
-    category: "FOOD" as any,
+    category: "FOOD",
     sourceUrl: "",
     submitterEmail: "",
     submitterContact: ""
@@ -179,7 +187,7 @@ export default function SubmitFestivalPage() {
                   </label>
                   <Select
                     value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value as any})}
+                    onChange={(e) => setFormData({...formData, category: e.target.value as "FOOD" | "CULTURE" | "ART" | "MUSIC" | "NATURE" | "OTHER"})}
                     className="bg-background/40 border-border font-serif text-xs font-bold"
                   >
                     <option value="FOOD">🍣 먹거리 축제</option>

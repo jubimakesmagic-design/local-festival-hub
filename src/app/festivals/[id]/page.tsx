@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { FestivalStatusBadge } from "@/components/festivals/FestivalStatusBadge";
 import { FestivalMapPlaceholder } from "@/components/festivals/FestivalMapPlaceholder";
 import { Badge } from "@/components/ui/Badge";
-import { Card, CardContent } from "@/components/ui/Card";
+
 import { 
   ArrowLeft, 
   Car, 

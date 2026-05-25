@@ -6,6 +6,7 @@ import { NewsCollector } from "./newsCollector";
 import { LocalGovernmentCollector } from "./localGovernmentCollector";
 import { UserSubmissionCollector } from "./userSubmissionCollector";
 import { CollectedFestival } from "./types";
+import { Festival, FestivalSource } from "@prisma/client";
 
 export type ScrapedFestival = CollectedFestival & {
   sourceType: "LOCAL_GOV" | "NEWS" | "USER_SUBMIT" | "VISIT_KOREA";
@@ -19,10 +20,14 @@ export interface SyncReport {
   details: string[];
 }
 
+type ExistingFestival = Festival & {
+  sources: FestivalSource[];
+};
+
 /**
  * 두 축제가 동일한 축제인지 유사도를 판단하는 헬퍼 함수
  */
-function isDuplicate(scraped: CollectedFestival, existing: any): boolean {
+function isDuplicate(scraped: CollectedFestival, existing: ExistingFestival): boolean {
   // 1. 이름 정규화 및 유사성 판단 (공백 및 특수문자 제거 후 상호 포함 여부)
   const normExistingName = existing.name.replace(/[\s\-_]+/g, "").toLowerCase();
   const normScrapedName = scraped.name.replace(/[\s\-_]+/g, "").toLowerCase();
@@ -137,7 +142,7 @@ export async function syncFestivals(): Promise<SyncReport> {
           name: scraped.sourceName,
           url: scraped.sourceUrl,
           type: scraped.sourceType
-        } as any);
+        });
         console.log(`[SyncEngine] [출처 추가] ID: ${matched.id} 에 새로운 출처 (${scraped.sourceType}) 등록`);
       }
 

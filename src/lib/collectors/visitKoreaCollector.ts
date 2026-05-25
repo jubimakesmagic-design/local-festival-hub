@@ -1,5 +1,6 @@
 // lib/collectors/visitKoreaCollector.ts
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
+import { normalizeCollectedFestival } from "./quality";
 
 interface TourApiItem {
   title?: string;
@@ -11,6 +12,10 @@ interface TourApiItem {
   eventstartdate?: string;
   eventenddate?: string;
   cat1?: string;
+  contenttypeid?: string;
+  homepage?: string;
+  overview?: string;
+  parking?: string;
 }
 
 export class VisitKoreaCollector implements FestivalCollector {
@@ -91,13 +96,15 @@ export class VisitKoreaCollector implements FestivalCollector {
       // 단일 객체로 넘어올 경우 배열로 감싸줍니다.
       const rawList = Array.isArray(items) ? items : [items];
       
-      const festivals: CollectedFestival[] = rawList.map((rawItem: unknown) => {
+      const festivals: CollectedFestival[] = await Promise.all(rawList.map(async (rawItem: unknown) => {
         const item = rawItem as TourApiItem;
         const title = item.title || "이름 없는 축제";
         const addr = item.addr1 || "";
-        const image = item.firstimage || item.firstimage2 || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop";
         const contentId = item.contentid || "";
+        const contentTypeId = item.contenttypeid || "15";
         const tel = item.tel || "";
+        const detail = contentId ? await this.fetchDetails(contentId, contentTypeId, serviceKey) : {};
+        const image = item.firstimage || item.firstimage2;
         
         // 날짜 파싱 (YYYYMMDD)
         const startDate = this.parseYYYYMMDD(item.eventstartdate, false);
@@ -107,24 +114,24 @@ export class VisitKoreaCollector implements FestivalCollector {
         const category = this.determineCategory(title);
         const region = this.extractRegion(addr);
 
-        return {
+        return normalizeCollectedFestival({
           name: title,
-          description: `${title}는 ${region}에서 열리는 특별한 지역 행사입니다. ${addr ? `행사 주소는 '${addr}'이며 ` : ""}${tel ? `문의처는 ${tel}입니다. ` : ""}다채로운 축제의 장에 여러분을 초대합니다.`,
+          description: detail.overview || `${title}는 ${region}에서 열리는 지역 행사입니다. ${addr ? `행사 주소는 '${addr}'이며 ` : ""}${tel ? `문의처는 ${tel}입니다. ` : ""}방문 전 공식 안내와 운영 시간을 다시 확인해 주세요.`,
           region,
           address: addr || undefined,
           startDate,
           endDate,
           category,
-          officialUrl: undefined, // 목록 API는 공식홈페이지가 제공되지 않음
+          officialUrl: detail.homepage,
           imageUrl: image,
-          hasParking: true, // 기본값 설정
+          hasParking: !!detail.parking || /주차|parking/i.test(detail.overview || ""),
           hasShuttle: false,
-          isPetFriendly: true,
+          isPetFriendly: false,
           isChildFriendly: true,
           sourceName: this.sourceName,
-          sourceUrl: `https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=${contentId}`
-        };
-      });
+          sourceUrl: detail.homepage || "https://korean.visitkorea.or.kr/main/fes_main.do"
+        });
+      }));
 
       console.log(`[VisitKoreaCollector] API 호출 성공 및 ${festivals.length}건 변환 완료.`);
 
@@ -140,6 +147,71 @@ export class VisitKoreaCollector implements FestivalCollector {
       console.log("[VisitKoreaCollector] 안전 모드 작동: 캐시된 고품질 실물 2026 데이터셋을 폴백으로 제공합니다.");
       return this.getMockFallbackData(params);
     }
+  }
+
+  private async fetchDetails(contentId: string, contentTypeId: string, serviceKey: string) {
+    const commonUrl = [
+      "https://apis.data.go.kr/B551011/KorService1/detailCommon1",
+      `?serviceKey=${serviceKey}`,
+      "&MobileOS=ETC",
+      "&MobileApp=local-festival-hub",
+      "&_type=json",
+      `&contentId=${encodeURIComponent(contentId)}`,
+      `&contentTypeId=${encodeURIComponent(contentTypeId)}`,
+      "&defaultYN=Y",
+      "&firstImageYN=Y",
+      "&addrinfoYN=Y",
+      "&overviewYN=Y"
+    ].join("");
+
+    const introUrl = [
+      "https://apis.data.go.kr/B551011/KorService1/detailIntro1",
+      `?serviceKey=${serviceKey}`,
+      "&MobileOS=ETC",
+      "&MobileApp=local-festival-hub",
+      "&_type=json",
+      `&contentId=${encodeURIComponent(contentId)}`,
+      `&contentTypeId=${encodeURIComponent(contentTypeId)}`
+    ].join("");
+
+    try {
+      const [commonResponse, introResponse] = await Promise.all([
+        fetch(commonUrl, { signal: AbortSignal.timeout(4000) }),
+        fetch(introUrl, { signal: AbortSignal.timeout(4000) })
+      ]);
+
+      const common = commonResponse.ok ? await commonResponse.json() : null;
+      const intro = introResponse.ok ? await introResponse.json() : null;
+      const commonItem = this.firstApiItem(common) as TourApiItem | undefined;
+      const introItem = this.firstApiItem(intro) as TourApiItem | undefined;
+
+      return {
+        homepage: this.stripHtml(commonItem?.homepage),
+        overview: this.stripHtml(commonItem?.overview),
+        parking: this.stripHtml(introItem?.parking)
+      };
+    } catch {
+      return {};
+    }
+  }
+
+  private firstApiItem(data: unknown): unknown {
+    const responseData = data as { response?: { body?: { items?: { item?: unknown } } } };
+    const item = responseData?.response?.body?.items?.item;
+    return Array.isArray(item) ? item[0] : item;
+  }
+
+  private stripHtml(value?: string): string | undefined {
+    if (!value) return undefined;
+    return value
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/?[^>]+(>|$)/g, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, "\"")
+      .replace(/&#39;/g, "'")
+      .trim() || undefined;
   }
 
   /**
@@ -300,7 +372,7 @@ export class VisitKoreaCollector implements FestivalCollector {
       }
     ];
 
-    return mockData.filter(item => {
+    return mockData.map(normalizeCollectedFestival).filter(item => {
       if (params.region && !item.region.includes(params.region)) return false;
       if (params.category && item.category !== params.category) return false;
       return true;

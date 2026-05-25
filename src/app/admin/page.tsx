@@ -1,7 +1,7 @@
 // src/app/admin/page.tsx
 import { db } from "@/lib/db";
 import { AdminDashboardClient } from "./AdminDashboardClient";
-import { Sparkles, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 
 export const revalidate = 0; // 실시간 변경 상태를 즉각 반영하기 위해 캐시 끔
 

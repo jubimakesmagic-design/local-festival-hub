@@ -11,7 +11,6 @@ import {
   CheckCircle2, 
   Info 
 } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
 import { FestivalStatusBadge } from "./FestivalStatusBadge";
 
 export interface FestivalCardProps {

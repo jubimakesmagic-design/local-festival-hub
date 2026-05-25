@@ -1,4 +1,5 @@
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
+import { normalizeCollectedFestival } from "./quality";
 
 interface GeminiFestivalResponse {
   name: string;
@@ -34,25 +35,30 @@ export class NewsCollector implements FestivalCollector {
     }
 
     try {
-      // 1. 구글 뉴스 RSS 피드 비동기 요청 (지역축제, 골목축제, 플리마켓, 버스킹 키워드 조합)
-      const query = "지역축제 OR 골목축제 OR 플리마켓 OR 버스킹";
-      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
-      
-      console.log(`[NewsCollector] 실시간 구글 뉴스 RSS 스크래핑 호출: ${rssUrl}`);
-      
-      const response = await fetch(rssUrl, {
-        method: "GET",
-        signal: AbortSignal.timeout(5000)
-      });
+      const queries = [
+        "2026 지역축제 공식 일정",
+        "2026 골목축제 플리마켓 버스킹",
+        "2026 야시장 축제 지자체",
+        "2026 봄 여름 축제 문화재단"
+      ];
 
-      if (!response.ok) {
-        throw new Error(`구글 뉴스 RSS 요청 실패: ${response.status}`);
-      }
+      const feeds = await Promise.all(queries.map(async (query) => {
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
+        console.log(`[NewsCollector] 실시간 구글 뉴스 RSS 스크래핑 호출: ${rssUrl}`);
+        const response = await fetch(rssUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(5000)
+        });
 
-      const xmlText = await response.text();
+        if (!response.ok) {
+          throw new Error(`구글 뉴스 RSS 요청 실패: ${response.status}`);
+        }
+
+        return response.text();
+      }));
 
       // 2. RSS 아이템 파싱
-      const items = this.extractRssItems(xmlText);
+      const items = feeds.flatMap((xmlText) => this.extractRssItems(xmlText));
       console.log(`[NewsCollector] RSS 피드 파싱 완료 - ${items.length}개의 최신 뉴스 기사 확보`);
 
       if (items.length === 0) {
@@ -69,9 +75,10 @@ export class NewsCollector implements FestivalCollector {
 [요구사항]
 1. 실제 특정 행사나 축제에 대한 소식이어야 합니다.
 2. 기사 본문에 언급된 명확한 시작일과 종료일을 분석해 날짜 형식(YYYY-MM-DD)으로 변환하세요. 연도가 명시되지 않았다면 2026년으로 추정하세요.
-3. 주차 여부, 셔틀 운영, 반려동물 동반, 영유아 동반 가능 여부는 기사 텍스트에 언급이 없더라도 상식적으로 합리적인 추정을 내려 불리언 값을 할당하세요.
+3. 주차 여부, 셔틀 운영, 반려동물 동반, 영유아 동반 가능 여부는 기사 텍스트에 명시된 내용이 있으면 반영하고, 명시되지 않았다면 false로 둡니다.
 4. 만약 기사 내용에서 어떠한 축제 정보도 추출할 수 없다면, 빈 배열 "festivals": [] 을 반환하세요.
-5. 반드시 지정된 JSON 스키마 규격을 충족해야 합니다.
+5. imageUrl은 기사나 공식 페이지에 있는 실제 이미지 URL만 사용하세요. Unsplash/Pexels/Pixabay 같은 범용 스톡 이미지는 절대 넣지 말고, 실제 이미지가 없으면 생략하세요.
+6. 반드시 지정된 JSON 스키마 규격을 충족해야 합니다.
 
 [뉴스 기사 목록]
 ${items.join("\n\n")}
@@ -157,7 +164,7 @@ ${items.join("\n\n")}
           endDate: new Date(item.endDate),
           category: item.category,
           officialUrl: item.officialUrl || undefined,
-          imageUrl: item.imageUrl || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop",
+          imageUrl: item.imageUrl || undefined,
           hasParking: !!item.hasParking,
           hasShuttle: !!item.hasShuttle,
           isPetFriendly: !!item.isPetFriendly,
@@ -165,7 +172,7 @@ ${items.join("\n\n")}
           sourceName: this.sourceName,
           sourceUrl: item.sourceUrl
         };
-      });
+      }).map(normalizeCollectedFestival);
 
       return result.filter(item => {
         if (params.region && !item.region.includes(params.region)) return false;
@@ -199,7 +206,7 @@ ${items.join("\n\n")}
       
       items.push(`기사 제목: ${cleanTitle}\n출처 링크: ${link}\n발행일: ${pubDate}\n내용 요약: ${cleanDesc}\n---`);
       
-      if (items.length >= 10) break; // 최대 10개로 한정하여 속도 및 토큰 절약
+      if (items.length >= 12) break; // 쿼리별 최대 12개로 한정하여 속도 및 토큰 절약
     }
     return items;
   }
@@ -296,7 +303,7 @@ ${items.join("\n\n")}
       }
     ];
 
-    return mockData.filter(item => {
+    return mockData.map(normalizeCollectedFestival).filter(item => {
       if (params.region && !item.region.includes(params.region)) return false;
       if (params.category && item.category !== params.category) return false;
       return true;

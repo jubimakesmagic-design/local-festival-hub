@@ -35,7 +35,7 @@ export class UserSubmissionCollector implements FestivalCollector {
           address: sub.address || undefined,
           startDate,
           endDate,
-          category: (sub.category as any) || "OTHER",
+          category: (sub.category as "FOOD" | "CULTURE" | "ART" | "MUSIC" | "NATURE" | "OTHER") || "OTHER",
           officialUrl: sub.sourceUrl || undefined,
           hasParking: false,
           hasShuttle: false,

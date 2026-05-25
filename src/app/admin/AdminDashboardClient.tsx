@@ -13,13 +13,12 @@ import {
   TrendingUp,
   AlertCircle,
   RefreshCw,
-  Sparkles,
   Compass
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { UserSubmission, Festival } from "@prisma/client";
+import { SyncReport } from "@/lib/collectors/sync";
 import { 
   approveSubmissionAction, 
   rejectSubmissionAction, 
@@ -28,8 +27,8 @@ import {
 } from "./actions";
 
 export interface AdminDashboardClientProps {
-  initialSubmissions: any[];
-  initialFestivals: any[];
+  initialSubmissions: UserSubmission[];
+  initialFestivals: Festival[];
 }
 
 export function formatExternalUrl(url: string) {
@@ -52,10 +51,10 @@ export function AdminDashboardClient({
   const [toastMsg, setToastMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   
   const [syncLoading, setSyncLoading] = useState(false);
-  const [syncReport, setSyncReport] = useState<any | null>(null);
+  const [syncReport, setSyncReport] = useState<SyncReport | null>(null);
 
   // 개별 축제별 수동 입력 스코어 로컬 상태 관리
-  const [tempScores, setTempScores] = useState<Record<number, number>>({});
+  const [tempScores, setTempScores] = useState<Record<number, number | "">>({});
 
   const showToast = (type: "success" | "error", text: string) => {
     setToastMsg({ type, text });
@@ -69,9 +68,10 @@ export function AdminDashboardClient({
     
     // 혹시 입력한 임시 수동 점수가 있다면 함께 전송
     const customScore = tempScores[submissionId];
+    const scoreToPass = (customScore === "" || customScore === undefined) ? undefined : customScore;
 
     try {
-      const res = await approveSubmissionAction(submissionId, customScore);
+      const res = await approveSubmissionAction(submissionId, scoreToPass);
       if (res.success) {
         showToast("success", "제보가 승인되었으며 축제로 정상 생성 및 배포되었습니다!");
         
@@ -118,7 +118,12 @@ export function AdminDashboardClient({
     const idStr = `adjust-${festivalId}`;
     const scoreToApply = tempScores[festivalId];
 
-    if (scoreToApply === undefined || scoreToApply < 0 || scoreToApply > 100) {
+    if (scoreToApply === undefined || scoreToApply === "") {
+      showToast("error", "0점부터 100점 사이의 유효한 점수를 입력해주세요.");
+      return;
+    }
+
+    if (scoreToApply < 0 || scoreToApply > 100) {
       showToast("error", "0점부터 100점 사이의 유효한 점수를 입력해주세요.");
       return;
     }
@@ -150,7 +155,7 @@ export function AdminDashboardClient({
     if (!isNaN(num)) {
       setTempScores({ ...tempScores, [id]: Math.max(0, Math.min(100, num)) });
     } else if (val === "") {
-      setTempScores({ ...tempScores, [id]: "" as any });
+      setTempScores({ ...tempScores, [id]: "" });
     }
   };
 

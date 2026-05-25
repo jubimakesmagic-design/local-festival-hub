@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 
@@ -10,12 +10,14 @@ export function FestivalSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // URL에서 'q' 매개변수를 읽어서 검색 기본값 설정
-  const [value, setValue] = useState(searchParams.get("q") || "");
+  const q = searchParams.get("q") || "";
+  const [value, setValue] = useState(q);
+  const [prevQ, setPrevQ] = useState(q);
 
-  useEffect(() => {
-    setValue(searchParams.get("q") || "");
-  }, [searchParams]);
+  if (q !== prevQ) {
+    setValue(q);
+    setPrevQ(q);
+  }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
