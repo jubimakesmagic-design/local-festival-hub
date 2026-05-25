@@ -36,18 +36,33 @@ export default async function FestivalDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // 1. 상세 조회 및 조회수 증가 (Server Action/RSC 동시 처리)
+  // 1. 상세 조회 및 조회수 증가 (서버리스 환경에서의 읽기 전용 데이터베이스 예외 처리)
   let festival;
   try {
-    // 트랜잭션 또는 단일 업데이트 후 조회
-    festival = await db.festival.update({
+    // 먼저 단순 조회를 실행합니다 (읽기 동작은 100% 정상 작동)
+    festival = await db.festival.findUnique({
       where: { id: festivalId },
-      data: { views: { increment: 1 } },
       include: {
         sources: true,
         programs: true
       }
     });
+
+    if (!festival) {
+      notFound();
+    }
+
+    // 서버리스(Vercel 등) 환경에서는 SQLite 파일 시스템이 읽기 전용이므로 조회수 증가 시 에러가 날 수 있습니다.
+    // 이 경우 에러를 무시하고 축제 상세 정보를 정상적으로 보여줍니다.
+    try {
+      await db.festival.update({
+        where: { id: festivalId },
+        data: { views: { increment: 1 } }
+      });
+      festival.views += 1; // 화면 표시용으로 조회수 1 증가
+    } catch (writeError) {
+      console.warn("[DetailPage] 서버리스 읽기 전용 환경으로 인해 조회수 증가가 스킵되었습니다 (정상 동작).");
+    }
   } catch (e) {
     console.error("[DetailPage] 축제 상세 조회 실패:", e);
     notFound();
