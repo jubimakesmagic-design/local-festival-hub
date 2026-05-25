@@ -1,5 +1,6 @@
 // lib/collectors/localGovernmentCollector.ts
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
+import { normalizeCollectedFestival } from "./quality";
 
 interface GeminiFestivalResponse {
   name: string;
@@ -35,25 +36,30 @@ export class LocalGovernmentCollector implements FestivalCollector {
     }
 
     try {
-      // 1. 구글 뉴스 RSS 피드 비동기 요청 (지자체 고시공고, 축제, 문화행사, 플리마켓, 야시장 키워드 조합)
-      const query = "지자체 고시공고 축제 OR 문화행사 OR 플리마켓 OR 야시장";
-      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
-      
-      console.log(`[LocalGovernmentCollector] 실시간 지자체 소식 RSS 스크래핑 호출: ${rssUrl}`);
-      
-      const response = await fetch(rssUrl, {
-        method: "GET",
-        signal: AbortSignal.timeout(5000)
-      });
+      const queries = [
+        "2026 지자체 축제 공식 홈페이지",
+        "2026 문화재단 축제 공지",
+        "2026 시청 군청 축제 보도자료",
+        "2026 관광재단 페스티벌 일정"
+      ];
 
-      if (!response.ok) {
-        throw new Error(`지자체 RSS 요청 실패: ${response.status}`);
-      }
+      const feeds = await Promise.all(queries.map(async (query) => {
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
+        console.log(`[LocalGovernmentCollector] 실시간 지자체 소식 RSS 스크래핑 호출: ${rssUrl}`);
+        const response = await fetch(rssUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(5000)
+        });
 
-      const xmlText = await response.text();
+        if (!response.ok) {
+          throw new Error(`지자체 RSS 요청 실패: ${response.status}`);
+        }
+
+        return response.text();
+      }));
 
       // 2. RSS 아이템 파싱
-      const items = this.extractRssItems(xmlText);
+      const items = feeds.flatMap((xmlText) => this.extractRssItems(xmlText));
       console.log(`[LocalGovernmentCollector] RSS 피드 파싱 완료 - ${items.length}개의 최신 지자체 공고/보도자료 확보`);
 
       if (items.length === 0) {
@@ -70,9 +76,10 @@ export class LocalGovernmentCollector implements FestivalCollector {
 [요구사항]
 1. 반드시 공공기관(지자체, 산하 재단 등)이 주최/주관/지원하는 축제 및 행사여야 합니다.
 2. 기사 및 공고에 언급된 명확한 시작일과 종료일을 분석해 날짜 형식(YYYY-MM-DD)으로 변환하세요. 연도가 명시되지 않았다면 2026년으로 추정하세요.
-3. 주차장 여부, 셔틀 운영 여부, 반려동물 동반 가능 여부, 영유아 동반 가능 여부는 기사 텍스트에 언급이 없더라도 공공 행사의 특성을 합리적으로 추정하여 불리언 값을 할당하세요. (예: 공원 야외 행사는 보통 반려동물 동반 및 영유아 동반 가능성이 높음)
+3. 주차장 여부, 셔틀 운영 여부, 반려동물 동반 가능 여부, 영유아 동반 가능 여부는 공고문에 명시된 경우만 true로 하고, 불명확하면 false로 둡니다.
 4. 만약 소식 내용에서 어떠한 축제 정보도 추출할 수 없다면, 빈 배열 "festivals": [] 을 반환하세요.
-5. 반드시 지정된 JSON 스키마 규격을 충족해야 합니다.
+5. imageUrl은 지자체/문화재단/공식 축제 페이지의 실제 포스터 또는 대표 이미지 URL만 사용하세요. Unsplash/Pexels/Pixabay 같은 범용 스톡 이미지는 절대 넣지 말고, 실제 이미지가 없으면 생략하세요.
+6. 반드시 지정된 JSON 스키마 규격을 충족해야 합니다.
 
 [지자체 소식 목록]
 ${items.join("\n\n")}
@@ -158,7 +165,7 @@ ${items.join("\n\n")}
           endDate: new Date(item.endDate),
           category: item.category,
           officialUrl: item.officialUrl || undefined,
-          imageUrl: item.imageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop",
+          imageUrl: item.imageUrl || undefined,
           hasParking: !!item.hasParking,
           hasShuttle: !!item.hasShuttle,
           isPetFriendly: !!item.isPetFriendly,
@@ -166,7 +173,7 @@ ${items.join("\n\n")}
           sourceName: this.sourceName,
           sourceUrl: item.sourceUrl
         };
-      });
+      }).map(normalizeCollectedFestival);
 
       return result.filter(item => {
         if (params.region && !item.region.includes(params.region)) return false;
@@ -200,7 +207,7 @@ ${items.join("\n\n")}
       
       items.push(`공고/보도 제목: ${cleanTitle}\n출처 링크: ${link}\n발행일: ${pubDate}\n내용 요약: ${cleanDesc}\n---`);
       
-      if (items.length >= 10) break; // 최대 10개로 한정하여 속도 및 토큰 절약
+      if (items.length >= 12) break; // 쿼리별 최대 12개로 한정하여 속도 및 토큰 절약
     }
     return items;
   }
@@ -314,7 +321,7 @@ ${items.join("\n\n")}
       }
     ];
 
-    return mockData.filter(item => {
+    return mockData.map(normalizeCollectedFestival).filter(item => {
       if (params.region && !item.region.includes(params.region)) return false;
       if (params.category && item.category !== params.category) return false;
       return true;

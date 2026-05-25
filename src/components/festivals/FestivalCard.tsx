@@ -1,15 +1,18 @@
 // src/components/festivals/FestivalCard.tsx
 import Link from "next/link";
-import { 
-  Car, 
-  Bus, 
-  PawPrint, 
-  Baby, 
-  Calendar, 
-  MapPin, 
-  Eye, 
-  CheckCircle2, 
-  Info 
+import Image from "next/image";
+import type React from "react";
+import {
+  Baby,
+  Bus,
+  Calendar,
+  Car,
+  CheckCircle2,
+  ExternalLink,
+  Eye,
+  Info,
+  MapPin,
+  PawPrint
 } from "lucide-react";
 import { FestivalStatusBadge } from "./FestivalStatusBadge";
 
@@ -46,143 +49,135 @@ export function FestivalCard({ festival }: FestivalCardProps) {
     OTHER: "기타 행사"
   };
 
-  const formattedCategory = categoryLabels[festival.category] || festival.category;
-
-  // 날짜 포맷터 (YYYY.MM.DD)
   const formatDate = (date: Date) => {
     const d = new Date(date);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
   };
 
-  // 신뢰도 점수 색상 및 레벨 판별
   const getTrustScoreColor = (score: number) => {
-    if (score >= 80) return "bg-accent text-accent font-bold";
-    if (score >= 50) return "bg-amber-500 text-amber-600 font-bold";
-    return "bg-primary text-primary font-bold";
+    if (score >= 80) return "bg-accent text-accent";
+    if (score >= 50) return "bg-amber-500 text-amber-600";
+    return "bg-primary text-primary";
   };
 
   const scoreColor = getTrustScoreColor(festival.trustScore);
-
-  // 기본 이미지 폴백
-  const defaultImage = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop";
-  const imageToShow = festival.imageUrl || defaultImage;
+  const imageToShow = festival.imageUrl || "/images/gokseong_roses.png";
+  const formattedCategory = categoryLabels[festival.category] || festival.category;
 
   return (
-    <div className="group overflow-hidden relative flex flex-col h-full polaroid-panel rounded-xl">
-      {/* 마스킹 테이프 아날로그 데코 */}
-      <div className={`masking-tape ${festival.id % 2 === 0 ? "masking-tape-stripe" : ""}`} />
-
-      {/* 카드 이미지 상단 - 폴라로이드 사진 인셋 스타일 */}
-      <div className="relative aspect-video w-full overflow-hidden bg-muted border border-border/60 rounded-lg">
-        <img
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+        <Image
           src={imageToShow}
           alt={festival.name}
-          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
+          width={640}
+          height={480}
+          sizes="(min-width: 1280px) 28vw, (min-width: 768px) 45vw, 92vw"
+          unoptimized
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        
-        {/* 우상단 빈티지 소인 데코 - 골든 스티커 느낌 */}
+
         {festival.trustScore >= 80 && (
-          <div className="absolute top-2.5 right-2.5 flex items-center space-x-1.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md rotate-3 border border-amber-300">
-            <CheckCircle2 size={10} className="shrink-0 text-white animate-pulse" />
-            <span>VERIFIED</span>
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-bold text-accent shadow-sm">
+            <CheckCircle2 size={12} className="shrink-0" />
+            <span>검증됨</span>
           </div>
         )}
 
-        {/* 좌하단 아날로그 진행상태 태그 */}
-        <div className="absolute bottom-2 left-2 flex gap-1 items-center">
+        <div className="absolute bottom-3 left-3">
           <FestivalStatusBadge startDate={festival.startDate} endDate={festival.endDate} />
         </div>
       </div>
 
-      {/* 카드 바디 */}
-      <div className="flex flex-col flex-1 pt-4">
-        {/* 제목 및 설명 */}
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex-1">
-          <div className="flex items-center space-x-2 text-[10px] font-extrabold text-muted-foreground font-typewriter uppercase mb-1.5">
-            <MapPin size={11} className="text-primary/70 shrink-0" />
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold text-muted-foreground">
+            <MapPin size={13} className="shrink-0 text-primary/80" />
             <span>{festival.region}</span>
-            <span>•</span>
-            <span className="text-primary stamp-badge px-1.5 py-0.5">{formattedCategory}</span>
+            <span className="h-1 w-1 rounded-full bg-border" />
+            <span className="text-primary">{formattedCategory}</span>
           </div>
+
           <Link href={`/festivals/${festival.id}`} className="block">
-            <h4 className="text-base font-extrabold text-foreground font-serif leading-tight group-hover:text-primary transition-colors line-clamp-1 mb-2">
+            <h2 className="mb-2 line-clamp-2 text-lg font-extrabold leading-snug text-foreground transition-colors group-hover:text-primary">
               {festival.name}
-            </h4>
+            </h2>
           </Link>
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-3.5">
-            {festival.description || "이 축제에 대한 소박하고 따뜻한 소식들이 기록 대기 중입니다."}
+
+          <p className="mb-4 line-clamp-3 text-sm leading-6 text-muted-foreground">
+            {festival.description || "축제 소개가 아직 보강 중입니다. 공식 출처가 확인되는 대로 업데이트됩니다."}
           </p>
         </div>
 
-        {/* 상세 아이콘 태그 - 아날로그 이중 대시 테두리 */}
-        <div className="flex flex-wrap gap-3 py-2.5 my-2 border-y border-dashed border-border/80 text-muted-foreground">
-          {festival.hasParking && (
-            <div className="flex items-center space-x-1 text-[10px]" title="주차공간 제공">
-              <Car size={13} className="text-primary shrink-0" />
-              <span className="font-bold">주차장</span>
-            </div>
-          )}
-          {festival.hasShuttle && (
-            <div className="flex items-center space-x-1 text-[10px]" title="셔틀버스 운영">
-              <Bus size={13} className="text-primary shrink-0" />
-              <span className="font-bold">셔틀편</span>
-            </div>
-          )}
-          {festival.isPetFriendly && (
-            <div className="flex items-center space-x-1 text-[10px]" title="반려동물 동반 가능">
-              <PawPrint size={13} className="text-primary shrink-0" />
-              <span className="font-bold">반려동물</span>
-            </div>
-          )}
-          {festival.isChildFriendly && (
-            <div className="flex items-center space-x-1 text-[10px]" title="아이와 함께 추천">
-              <Baby size={13} className="text-primary shrink-0" />
-              <span className="font-bold">아이동반</span>
-            </div>
-          )}
+        <div className="mb-4 flex min-h-8 flex-wrap gap-2 border-y border-border py-3 text-muted-foreground">
+          {festival.hasParking && <FeaturePill icon={Car} label="주차" title="주차공간 제공" />}
+          {festival.hasShuttle && <FeaturePill icon={Bus} label="셔틀" title="셔틀버스 운영" />}
+          {festival.isPetFriendly && <FeaturePill icon={PawPrint} label="반려동물" title="반려동물 동반 가능" />}
+          {festival.isChildFriendly && <FeaturePill icon={Baby} label="아이" title="아이와 함께 추천" />}
         </div>
 
-        {/* 신뢰도 점수 그래프 - 아날로그 계기판 감성 */}
-        <div className="space-y-1.5 mb-4">
+        <div className="mb-4 space-y-2">
           <div className="flex items-center justify-between text-[11px] font-bold">
-            <span className="text-muted-foreground flex items-center space-x-1">
-              <span>기록 신뢰지수</span>
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <span>출처 신뢰도</span>
               <span title="지자체 출처, 공식 사이트 유무, 편의정보 유무 등으로 자동 계산되는 신뢰 수준입니다.">
-                <Info size={10} className="text-muted-foreground/60 cursor-help" />
+                <Info size={11} className="cursor-help text-muted-foreground/60" />
               </span>
             </span>
-            <span className={`font-bold font-typewriter ${scoreColor.split(" ")[1]}`}>{festival.trustScore}%</span>
+            <span className={`font-bold ${scoreColor.split(" ")[1]}`}>{festival.trustScore}%</span>
           </div>
-          <div className="h-1.5 w-full bg-secondary border border-border/40 rounded-full overflow-hidden shadow-inner">
-            <div
-              className={`h-full transition-all duration-500 rounded-full ${scoreColor.split(" ")[0]}`}
-              style={{ width: `${festival.trustScore}%` }}
-            />
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className={`h-full rounded-full transition-all duration-500 ${scoreColor.split(" ")[0]}`} style={{ width: `${festival.trustScore}%` }} />
           </div>
         </div>
 
-        {/* 하단 메타 정보 (기간 / 조회수) - 타자기 서체 */}
-        <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground font-typewriter border-t border-border/30 pt-3">
-          <span className="flex items-center space-x-1">
-            <Calendar size={11} className="shrink-0" />
+        <div className="flex items-center justify-between gap-3 border-t border-border pt-3 text-xs font-bold text-muted-foreground">
+          <span className="flex min-w-0 items-center gap-1">
+            <Calendar size={13} className="shrink-0" />
             <span>{formatDate(festival.startDate)} - {formatDate(festival.endDate)}</span>
           </span>
-          <span className="flex items-center space-x-1">
-            <Eye size={11} className="shrink-0" />
-            <span>VIEWS: {festival.views}</span>
+          <span className="flex shrink-0 items-center gap-1">
+            <Eye size={13} className="shrink-0" />
+            <span>{festival.views}</span>
           </span>
         </div>
 
-        {/* 카드 하단 액션 버튼 */}
-        <div className="pt-4">
+        <div className="grid grid-cols-[1fr_auto] gap-2 pt-4">
           <Link href={`/festivals/${festival.id}`} className="block">
-            <button className="w-full h-10 text-xs font-bold rounded-lg press-button cursor-pointer">
-              기록첩 펼쳐보기
+            <button className="h-10 w-full cursor-pointer rounded-md text-sm font-bold press-button">
+              자세히 보기
             </button>
           </Link>
+          {festival.officialUrl && (
+            <a
+              href={festival.officialUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-primary hover:text-primary"
+              title="공식 사이트 열기"
+            >
+              <ExternalLink size={16} />
+            </a>
+          )}
         </div>
       </div>
+    </article>
+  );
+}
+
+function FeaturePill({
+  icon: Icon,
+  label,
+  title
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  title: string;
+}) {
+  return (
+    <div className="flex items-center gap-1 rounded-full bg-secondary px-2 py-1 text-[11px] font-bold" title={title}>
+      <Icon size={12} className="shrink-0 text-primary" />
+      <span>{label}</span>
     </div>
   );
 }

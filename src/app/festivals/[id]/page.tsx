@@ -1,5 +1,6 @@
 // src/app/festivals/[id]/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { FestivalStatusBadge } from "@/components/festivals/FestivalStatusBadge";
@@ -81,7 +82,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
 
   const scoreDetails = getTrustScoreDetails(festival.trustScore);
 
-  const defaultImage = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&auto=format&fit=crop";
+  const defaultImage = "/images/gokseong_roses.png";
   const heroImage = festival.imageUrl || defaultImage;
 
   return (
@@ -89,9 +90,14 @@ export default async function FestivalDetailPage({ params }: PageProps) {
 
       {/* 1. 자이언트 히어로 배너 영역 - 화사하고 맑은 와이드 이미지 */}
       <section className="relative h-[320px] md:h-[400px] w-full overflow-hidden border-b border-border/50 bg-background">
-        <img
+        <Image
           src={heroImage}
           alt={festival.name}
+          width={1600}
+          height={600}
+          sizes="100vw"
+          priority
+          unoptimized
           className="h-full w-full object-cover transition-transform duration-700"
         />
         {/* 화사한 반투명 그라데이션 스크린 */}
@@ -318,7 +324,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
             {/* 검수망 안내 */}
             <div className="rounded-2xl border border-border/60 bg-secondary/10 p-5 text-xs text-muted-foreground/80 leading-relaxed shadow-sm">
               <span className="font-bold text-foreground block mb-1 font-serif">기록 검수 가이드</span>
-              동네축제 기록첩의 모든 현황은 지자체 고문, 지역 향토 소식, 탐험가의 수기 제보를 엄밀하게 대조한 실명 검증 문서입니다. 정보 수정이나 폐지 요청은 제보함을 통해 제출하실 수 있습니다.
+              축제 정보는 지자체 공지, 한국관광공사 데이터, 지역 언론, 사용자 제보를 함께 대조해 검수합니다. 정보 수정이나 폐지 요청은 제보함을 통해 제출하실 수 있습니다.
             </div>
 
           </div>

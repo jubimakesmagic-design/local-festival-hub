@@ -6,6 +6,7 @@ import { NewsCollector } from "./newsCollector";
 import { LocalGovernmentCollector } from "./localGovernmentCollector";
 import { UserSubmissionCollector } from "./userSubmissionCollector";
 import { CollectedFestival } from "./types";
+import { isLikelyStockImage, isUsableUrl, normalizeCollectedFestival } from "./quality";
 import { Festival, FestivalSource } from "@prisma/client";
 
 export type ScrapedFestival = CollectedFestival & {
@@ -75,21 +76,22 @@ export async function syncFestivals(): Promise<SyncReport> {
   ];
 
   // 2. 외부 데이터 일괄 수집
-  const allCollected: ScrapedFestival[] = [];
-  for (const collector of collectors) {
+  const collectedBySource = await Promise.all(collectors.map(async (collector) => {
     try {
       const data = await collector.collect({});
       console.log(`[SyncEngine] [${collector.sourceName}] 수집 성공 - ${data.length}건`);
-      const enriched = data.map(item => ({
-        ...item,
+      return data.map(item => ({
+        ...normalizeCollectedFestival(item),
         sourceType: collector.sourceType
       }));
-      allCollected.push(...enriched);
     } catch (error) {
       console.error(`[SyncEngine] [${collector.sourceName}] 수집 중 에러 발생:`, error);
       report.details.push(`[수집 에러] ${collector.sourceName} 호출 실패`);
+      return [];
     }
-  }
+  }));
+
+  const allCollected: ScrapedFestival[] = collectedBySource.flat();
 
   report.collectedCount = allCollected.length;
 
@@ -116,8 +118,8 @@ export async function syncFestivals(): Promise<SyncReport> {
       
       // 누락된 필드 보완 (데이터 풍부화)
       const updatedDescription = matched.description || scraped.description || null;
-      const updatedImageUrl = matched.imageUrl || scraped.imageUrl || null;
-      const updatedOfficialUrl = matched.officialUrl || scraped.officialUrl || null;
+      const updatedImageUrl = (!matched.imageUrl || isLikelyStockImage(matched.imageUrl)) ? (scraped.imageUrl || matched.imageUrl || null) : matched.imageUrl;
+      const updatedOfficialUrl = isUsableUrl(matched.officialUrl) ? matched.officialUrl : (scraped.officialUrl || null);
       
       const updatedParking = matched.hasParking || scraped.hasParking;
       const updatedShuttle = matched.hasShuttle || scraped.hasShuttle;
@@ -125,7 +127,7 @@ export async function syncFestivals(): Promise<SyncReport> {
       const updatedChild = matched.isChildFriendly || scraped.isChildFriendly;
 
       // 출처 리스트 업데이트
-      const sourceExists = matched.sources.some(s => s.type === scraped.sourceType);
+      const sourceExists = matched.sources.some(s => s.url === scraped.sourceUrl);
       if (!sourceExists) {
         await db.festivalSource.create({
           data: {

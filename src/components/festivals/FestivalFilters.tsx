@@ -19,31 +19,38 @@ export function FestivalFilters() {
 
   const regions = [
     { value: "all", label: "전국 전체" },
+    { value: "서울", label: "서울" },
+    { value: "부산", label: "부산" },
+    { value: "대구", label: "대구" },
+    { value: "인천", label: "인천" },
+    { value: "광주", label: "광주" },
+    { value: "대전", label: "대전" },
+    { value: "울산", label: "울산" },
+    { value: "세종", label: "세종" },
     { value: "경기", label: "경기도" },
     { value: "강원", label: "강원도" },
+    { value: "충북", label: "충청북도" },
+    { value: "충남", label: "충청남도" },
+    { value: "전북", label: "전라북도" },
     { value: "전남", label: "전라남도" },
-    { value: "대구", label: "대구광역시" },
-    { value: "부산", label: "부산광역시" },
-    { value: "세종", label: "세종시" },
-    { value: "충남", label: "충청남도" }
+    { value: "경북", label: "경상북도" },
+    { value: "경남", label: "경상남도" },
+    { value: "제주", label: "제주" }
   ];
 
   const categories = [
     { value: "all", label: "전체 카테고리" },
-    { value: "FOOD", label: "🍣 먹거리 축제" },
-    { value: "NATURE", label: "🌸 자연/경관" },
-    { value: "CULTURE", label: "🏛️ 전통/문화" },
-    { value: "ART", label: "🎨 전시/예술" },
-    { value: "MUSIC", label: "🎵 공연/음악" },
-    { value: "OTHER", label: "🪁 기타 행사" }
+    { value: "FOOD", label: "먹거리 축제" },
+    { value: "NATURE", label: "자연/경관" },
+    { value: "CULTURE", label: "전통/문화" },
+    { value: "ART", label: "전시/예술" },
+    { value: "MUSIC", label: "공연/음악" },
+    { value: "OTHER", label: "기타 행사" }
   ];
 
   const months = [
     { value: "all", label: "전체" },
-    { value: "4", label: "4월" },
-    { value: "5", label: "5월" },
-    { value: "6", label: "6월" },
-    { value: "7", label: "7월" }
+    ...Array.from({ length: 12 }, (_, idx) => ({ value: String(idx + 1), label: `${idx + 1}월` }))
   ];
 
   // 단일 매개변수 실시간 업데이트 함수
@@ -68,8 +75,8 @@ export function FestivalFilters() {
     <div className="space-y-6 text-sm font-semibold">
       {/* 1. 지역 대시보드 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-typewriter">REGIONS / 지역</h5>
-        <div className="grid grid-cols-2 gap-2">
+        <h5 className="text-[11px] font-bold text-muted-foreground">지역</h5>
+        <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto pr-1">
           {regions.map((reg) => {
             const isSelected = currentRegion === reg.value;
             return (
@@ -92,8 +99,8 @@ export function FestivalFilters() {
 
       {/* 개최 월별 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-typewriter">MONTHS / 월별</h5>
-        <div className="grid grid-cols-5 gap-1.5">
+        <h5 className="text-[11px] font-bold text-muted-foreground">개최 월</h5>
+        <div className="grid grid-cols-4 gap-1.5">
           {months.map((m) => {
             const isSelected = currentMonth === m.value;
             return (
@@ -115,7 +122,7 @@ export function FestivalFilters() {
 
       {/* 2. 카테고리별 아날로그 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-typewriter">CATEGORIES / 분야</h5>
+        <h5 className="text-[11px] font-bold text-muted-foreground">분야</h5>
         <div className="flex flex-col space-y-1.5">
           {categories.map((cat) => {
             const isSelected = currentCategory === cat.value;
@@ -139,13 +146,13 @@ export function FestivalFilters() {
 
       {/* 3. 편의/옵션 다차원 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider font-typewriter">OPTIONS / 편의정보</h5>
+        <h5 className="text-[11px] font-bold text-muted-foreground">편의정보</h5>
         <div className="space-y-2">
           {[
-            { key: "parking", val: hasParking, label: "🚗 무료 주차공간 제공" },
-            { key: "shuttle", val: hasShuttle, label: "🚌 무료 셔틀버스 운영" },
-            { key: "pet", val: isPetFriendly, label: "🐶 반려동물 동반 가능" },
-            { key: "child", val: isChildFriendly, label: "👶 아이와 가기 좋은 곳" }
+            { key: "parking", val: hasParking, label: "주차공간 제공" },
+            { key: "shuttle", val: hasShuttle, label: "셔틀버스 운영" },
+            { key: "pet", val: isPetFriendly, label: "반려동물 동반 가능" },
+            { key: "child", val: isChildFriendly, label: "아이와 가기 좋은 곳" }
           ].map((opt) => {
             return (
               <label
@@ -181,11 +188,11 @@ export function FestivalFilters() {
     <>
       {/* 데스크톱 사이드바 뷰 - 여행자 기록 대장 북마크 감성 */}
       <aside className="hidden lg:block w-72 shrink-0">
-        <div className="sticky top-20 bg-card border-2 border-border p-5 shadow-[4px_4px_0px_0px_hsl(var(--border))] rounded">
-          <div className="flex flex-row items-center justify-between pb-4 border-b border-dashed border-border mb-4">
-            <h4 className="text-xs flex items-center space-x-1.5 font-extrabold uppercase font-typewriter text-foreground">
+        <div className="sticky top-20 rounded-lg border border-border bg-card p-5 shadow-sm">
+          <div className="flex flex-row items-center justify-between pb-4 border-b border-border mb-4">
+            <h4 className="text-sm flex items-center space-x-1.5 font-extrabold text-foreground">
               <SlidersHorizontal size={14} className="text-primary" />
-              <span>SEARCH FILTERS</span>
+              <span>상세 조건</span>
             </h4>
           </div>
           <div>{filterContent}</div>
@@ -229,4 +236,3 @@ export function FestivalFilters() {
     </>
   );
 }
-

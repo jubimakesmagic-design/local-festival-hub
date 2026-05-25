@@ -4,7 +4,7 @@ import { FestivalCard } from "@/components/festivals/FestivalCard";
 import { FestivalFilters } from "@/components/festivals/FestivalFilters";
 import { FestivalSearch } from "@/components/festivals/FestivalSearch";
 import { FestivalSort } from "@/components/festivals/FestivalSort";
-import { Map, Compass } from "lucide-react";
+import { CalendarDays, CheckCircle2, Database, Map } from "lucide-react";
 import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
 
@@ -73,8 +73,7 @@ export default async function Home({ searchParams }: PageProps) {
     const mNum = Number(month);
     if (!isNaN(mNum)) {
       const pad = (n: number) => String(n).padStart(2, "0");
-      const lastDays: Record<number, number> = { 4: 30, 5: 31, 6: 30, 7: 31 };
-      const lastDay = lastDays[mNum] || 31;
+      const lastDay = new Date(2026, mNum, 0).getDate();
       const startOfMonth = new Date(`2026-${pad(mNum)}-01T00:00:00+09:00`);
       const endOfMonth = new Date(`2026-${pad(mNum)}-${pad(lastDay)}T23:59:59+09:00`);
       where.startDate = { lte: endOfMonth };
@@ -111,46 +110,44 @@ export default async function Home({ searchParams }: PageProps) {
   const verifiedCount = festivals.filter(f => f.trustScore >= 80).length;
 
   return (
-    <div className="min-h-screen py-10 relative overflow-hidden bg-background">
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 md:px-6 md:py-10">
         
-        {/* 상단 화사하고 프리미엄한 축제 광장 히어로 배너 */}
-        <section className="mb-12 text-center max-w-4xl mx-auto space-y-6 animate-slide-up pt-6 relative">
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-extrabold tracking-wider stamp-badge animate-fade-in mx-auto">
-            <Compass size={14} className="text-primary animate-spin-slow" />
-            <span className="font-typewriter uppercase tracking-wider text-[10px]">LOCAL FESTIVAL NOTEBOOK</span>
-          </div>
-          
-          <h2 className="text-3xl md:text-5xl lg:text-5.5xl font-black tracking-tight text-foreground font-serif leading-tight">
-            발길 닿는 곳마다 마주하는,<br />
-            우리 동네 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">숨은 축제 기록첩</span>
-          </h2>
-          
-          <p className="text-xs md:text-base text-muted-foreground font-medium max-w-xl mx-auto leading-relaxed">
-            대형 공식 사이트에는 없는 따뜻하고 소박한 동네 소식, 이웃들의 장터, 마을 골목 버스킹까지 직접 찾고 실시간 제보해 나갑니다.
-          </p>
+        <section className="mb-8 rounded-lg border border-border bg-card p-5 shadow-sm md:p-7">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-bold text-primary">
+                <Database size={14} />
+                전국 축제 통합 수집
+              </div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
+                공식 출처와 실제 이미지를 우선한 축제 탐색
+              </h1>
+              <p className="text-sm leading-6 text-muted-foreground md:text-base">
+                한국관광공사, 지자체, 지역 언론, 사용자 제보를 교차 수집하고 깨진 출처와 범용 스톡 이미지는 걸러냅니다.
+              </p>
+            </div>
 
-          {/* 실시간 라이브 통계 스티커 보드 */}
-          <div className="grid grid-cols-3 gap-3 md:gap-4 max-w-2xl mx-auto pt-4 pb-2">
-            <div className="bg-card border border-border/80 p-3 rounded-xl shadow-md shadow-primary/5 hover:scale-103 transition-transform">
-              <span className="block text-[10px] md:text-xs font-bold text-muted-foreground uppercase font-typewriter">TOTAL RECORDS</span>
-              <span className="block text-lg md:text-2xl font-black text-primary font-typewriter pt-1">{totalCount}개</span>
-            </div>
-            <div className="bg-card border border-border/80 p-3 rounded-xl shadow-md shadow-primary/5 hover:scale-103 transition-transform">
-              <span className="block text-[10px] md:text-xs font-bold text-muted-foreground uppercase font-typewriter">ONGOING NOW</span>
-              <span className="block text-lg md:text-2xl font-black text-accent font-typewriter pt-1">{activeCount}개</span>
-            </div>
-            <div className="bg-card border border-border/80 p-3 rounded-xl shadow-md shadow-primary/5 hover:scale-103 transition-transform">
-              <span className="block text-[10px] md:text-xs font-bold text-muted-foreground uppercase font-typewriter">VERIFIED ARCHIVES</span>
-              <span className="block text-lg md:text-2xl font-black text-primary font-typewriter pt-1">{verifiedCount}개</span>
+            <div className="grid grid-cols-3 gap-2 sm:min-w-[360px]">
+              {[
+                { label: "검색 결과", value: totalCount, icon: Database },
+                { label: "진행 중", value: activeCount, icon: CalendarDays },
+                { label: "고신뢰", value: verifiedCount, icon: CheckCircle2 }
+              ].map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <div key={stat.label} className="rounded-lg border border-border bg-background p-3">
+                    <Icon size={15} className="mb-2 text-primary" />
+                    <span className="block text-[11px] font-semibold text-muted-foreground">{stat.label}</span>
+                    <strong className="mt-1 block text-xl font-extrabold text-foreground">{stat.value}개</strong>
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          <hr className="diary-divider max-w-[240px] mx-auto opacity-60" />
         </section>
 
-        {/* 검색 및 정렬 컨트롤 보드 */}
-        <section className="mb-10 max-w-4xl mx-auto bg-card border border-border/80 p-5 md:p-6 shadow-xl shadow-primary/5 rounded-2xl space-y-4 animate-slide-up">
+        <section className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm md:p-5">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="w-full md:flex-1">
               <Suspense fallback={<div className="h-10 bg-muted/20 animate-pulse rounded-lg" />}>
@@ -158,8 +155,8 @@ export default async function Home({ searchParams }: PageProps) {
               </Suspense>
             </div>
             <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-4 shrink-0">
-              <span className="text-[11px] font-bold text-muted-foreground font-typewriter uppercase">
-                RECORDS: <span className="text-primary font-black">{totalCount}</span> FOUND
+              <span className="text-xs font-bold text-muted-foreground">
+                {totalCount}건 표시
               </span>
               <Suspense fallback={<div className="h-10 w-48 bg-muted/20 animate-pulse rounded-lg" />}>
                 <FestivalSort />
@@ -168,7 +165,6 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        {/* 메인 레이아웃: 좌측 다이어리 필터 북마크 + 우측 스크랩 북 카드 리스트 */}
         <section className="flex flex-col lg:flex-row gap-8 items-start">
           
           {/* 다차원 상세 필터 */}
@@ -179,9 +175,9 @@ export default async function Home({ searchParams }: PageProps) {
           {/* 축제 카드 리스트 Grid */}
           <div className="flex-1 w-full">
             {festivals.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {festivals.map((fest) => (
-                  <div key={fest.id} className="animate-slide-up relative">
+                  <div key={fest.id}>
                     <FestivalCard festival={fest} />
                   </div>
                 ))}

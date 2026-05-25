@@ -11,7 +11,8 @@ const FAKE_URL_PATTERNS = [
   /idxno=20\d{6,}/i,
   /[?&]id=20\d{6,}/i,
   /cotid=(bof|wdjfest|mud|butterfly|ceramic)_20\d{2}/i,
-  /\/multi\/public\/notify\/view/i
+  /\/multi\/public\/notify\/view/i,
+  /jejurelease/i
 ];
 
 const FESTIVAL_IMAGE_FALLBACKS: Array<{ pattern: RegExp; imageUrl: string }> = [
@@ -23,6 +24,7 @@ const FESTIVAL_IMAGE_FALLBACKS: Array<{ pattern: RegExp; imageUrl: string }> = [
 
 export function isUsableUrl(url?: string | null): url is string {
   if (!url) return false;
+  if (/\s/.test(url)) return false;
 
   try {
     const parsed = new URL(url);

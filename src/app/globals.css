@@ -1,68 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Nanum+Myeongjo:wght@400;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* 라이트 모드 (Day Festival): 따뜻한 햇살과 활기찬 마을 축제 느낌 */
-  --background: 43 100% 98.8%; /* #FFFDF8 아주 화사하고 포근한 햇살빛 웜 화이트 */
-  --foreground: 30 18% 12%; /* #251F19 가독성이 높고 따뜻한 에스프레소 블랙 */
+  --background: 210 24% 98%;
+  --foreground: 222 28% 12%;
   
-  --card: 0 0% 100%; /* #FFFFFF 깨끗하고 밝은 화이트 페이퍼 */
-  --card-foreground: 30 18% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 28% 12%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 30 18% 12%;
+  --popover-foreground: 222 28% 12%;
   
-  --primary: 16 100% 55%; /* #FF5722 활기찬 페스티벌 코랄 오렌지 */
+  --primary: 199 89% 34%;
   --primary-foreground: 0 0% 100%;
   
-  --secondary: 47 100% 94%; /* #FFF8D4 따뜻한 햇빛을 닮은 솔라 골드 */
-  --secondary-foreground: 30 18% 12%;
+  --secondary: 204 30% 93%;
+  --secondary-foreground: 222 28% 12%;
   
-  --muted: 40 40% 95.5%; /* #FAF4E8 부드러운 오트밀 베이지 */
-  --muted-foreground: 30 10% 48%; /* 포근한 코코아 브라운 */
+  --muted: 210 24% 95%;
+  --muted-foreground: 215 14% 42%;
   
-  --accent: 155 75% 38%; /* #10B981 싱그러운 축제 잔디빛 초록 */
+  --accent: 154 72% 32%;
   --accent-foreground: 0 0% 100%;
   
   --destructive: 350 85% 55%;
   --destructive-foreground: 0 0% 100%;
   
-  --border: 40 30% 89%; /* #F2E6D2 차분한 샌드 베이지 보더 */
-  --input: 40 30% 89%;
-  --ring: 16 100% 55%;
+  --border: 214 24% 88%;
+  --input: 214 24% 88%;
+  --ring: 199 89% 34%;
   
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 }
 
 .dark {
-  /* 다크 모드 (Night Festival): 밤하늘 아래 오색 풍등과 낭만적인 전등이 수놓인 밤 축제 느낌 */
-  --background: 240 40% 7.8%; /* #0A0A1C 낭만적인 밤하늘 사파이어 딥 나이트 */
-  --foreground: 40 100% 98%; /* #FFFDF5 은은하고 포근한 미색 웜 아이보리 */
+  --background: 222 34% 8%;
+  --foreground: 210 30% 96%;
   
-  --card: 240 35% 12.5%; /* #13132B 아늑한 밤축제 딥 인디고 퍼플 */
-  --card-foreground: 40 100% 98%;
+  --card: 222 28% 12%;
+  --card-foreground: 210 30% 96%;
   
-  --popover: 240 35% 12%;
-  --popover-foreground: 40 100% 98%;
+  --popover: 222 28% 12%;
+  --popover-foreground: 210 30% 96%;
   
-  --primary: 18 100% 63%; /* #FF7043 어두운 밤을 따뜻하게 밝히는 모닥불 오렌지 */
-  --primary-foreground: 240 40% 6%;
+  --primary: 199 90% 60%;
+  --primary-foreground: 222 34% 8%;
   
-  --secondary: 240 25% 17.5%; /* #21213A 세련된 야간 네이비 */
-  --secondary-foreground: 40 100% 98%;
+  --secondary: 220 20% 18%;
+  --secondary-foreground: 210 30% 96%;
   
-  --muted: 240 20% 15.5%;
-  --muted-foreground: 240 10% 68%;
+  --muted: 220 20% 16%;
+  --muted-foreground: 215 16% 70%;
   
-  --accent: 45 100% 58%; /* #FFCA28 밤하늘에 띄우는 소원 풍등 골드 */
-  --accent-foreground: 240 40% 6%;
+  --accent: 154 68% 48%;
+  --accent-foreground: 222 34% 8%;
   
   --destructive: 350 80% 58%;
   --destructive-foreground: 0 0% 100%;
   
-  --border: 240 20% 19%;
-  --input: 240 20% 19%;
-  --ring: 18 100% 63%;
+  --border: 220 18% 22%;
+  --input: 220 18% 22%;
+  --ring: 199 90% 60%;
 }
 
 @theme {
@@ -91,9 +88,9 @@
   --radius-sm: calc(var(--radius) - 0.4rem);
 
   /* 타이포그래피 확장 */
-  --font-sans: "Outfit", "Geist", sans-serif;
-  --font-serif: "Lora", "Nanum Myeongjo", "Playfair Display", Georgia, serif;
-  --font-typewriter: "Courier Prime", "Courier", monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --font-serif: ui-serif, "Apple SD Gothic Neo", "Malgun Gothic", Georgia, serif;
+  --font-typewriter: ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
 
 body {
@@ -102,18 +99,6 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  /* 은은하게 흩날리는 컬러풀 축제 콘페티 패턴 */
-  background-image: 
-    radial-gradient(hsl(var(--primary) / 0.045) 1.2px, transparent 1.2px),
-    radial-gradient(hsl(var(--accent) / 0.035) 1.2px, transparent 1.2px);
-  background-size: 36px 36px;
-  background-position: 0 0, 18px 18px;
-}
-
-.dark body {
-  background-image: 
-    radial-gradient(hsl(var(--primary) / 0.065) 1.2px, transparent 1.2px),
-    radial-gradient(hsl(var(--accent) / 0.045) 1.2px, transparent 1.2px);
 }
 
 /* 1. 폴라로이드 패널 클래스 - 프리미엄 크리스프 섀도우 */
@@ -193,7 +178,7 @@ body {
   border: none;
   font-family: var(--font-sans);
   font-weight: 700;
-  box-shadow: 0 4px 14px -2px rgba(255, 87, 34, 0.25);
+  box-shadow: 0 6px 14px -8px hsl(var(--primary) / 75%);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
@@ -204,12 +189,12 @@ body {
 .press-button:hover {
   background-color: hsl(var(--primary) / 92%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px -1px rgba(255, 87, 34, 0.35);
+  box-shadow: 0 10px 18px -10px hsl(var(--primary) / 85%);
 }
 
 .press-button:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(255, 87, 34, 0.2);
+  box-shadow: none;
 }
 
 /* 5. 타자기 글자 효과 */

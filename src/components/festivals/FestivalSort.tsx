@@ -24,10 +24,10 @@ export function FestivalSort() {
         onChange={handleSortChange} 
         className="bg-card border-border/80 text-xs font-bold h-10 py-2 shadow-sm"
       >
-        <option value="trust">⭐ 신뢰도 점수 순</option>
-        <option value="newest">📅 최근 등록순</option>
-        <option value="date">🚀 축제 시작일순</option>
-        <option value="views">🔥 조회 인기순</option>
+        <option value="trust">신뢰도 점수 순</option>
+        <option value="newest">최근 등록순</option>
+        <option value="date">축제 시작일순</option>
+        <option value="views">조회 인기순</option>
       </Select>
     </div>
   );
