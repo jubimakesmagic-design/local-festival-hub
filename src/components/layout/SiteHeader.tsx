@@ -11,7 +11,7 @@ export function SiteHeader() {
 
   const links = [
     { href: "/", label: "축제 둘러보기", icon: MapPin },
-    { href: "/submit", label: "축제 제보하기", icon: PlusCircle },
+    // { href: "/submit", label: "축제 제보하기", icon: PlusCircle },
     { href: "/admin", label: "관리자 검수", icon: ShieldAlert },
   ];
 

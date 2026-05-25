@@ -324,7 +324,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
             {/* 검수망 안내 */}
             <div className="rounded-2xl border border-border/60 bg-secondary/10 p-5 text-sm text-muted-foreground/80 leading-relaxed shadow-sm">
               <span className="font-bold text-foreground block mb-1 font-serif">기록 검수 가이드</span>
-              축제 정보는 지자체 공지, 한국관광공사 데이터, 지역 언론, 사용자 제보를 함께 대조해 검수합니다. 정보 수정이나 폐지 요청은 제보함을 통해 제출하실 수 있습니다.
+              축제 정보는 지자체 공지, 한국관광공사 데이터, 지역 언론의 최신 공식 기록을 함께 상호 교차 대조하여 안전하게 검수 및 등재합니다.
             </div>
 
           </div>

@@ -207,7 +207,7 @@ export default async function Home({ searchParams }: PageProps) {
                 <div className="space-y-2">
                   <h4 className="text-xl font-extrabold text-foreground font-serif">검색 결과가 없습니다</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    다른 단어로 검색하시거나 필터 선택을 줄여보세요. 아직 여기에 등록되지 않은 작은 동네 축제를 알고 계시다면 언제든 제보해 주세요!
+                    다른 단어로 검색하시거나 필터 선택을 줄여보세요. 유효한 공식 출처가 확인되는 대로 신속하게 최신 로컬 축제 소식을 업데이트하겠습니다.
                   </p>
                 </div>
               </div>
