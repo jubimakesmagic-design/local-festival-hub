@@ -19,7 +19,8 @@ const FESTIVAL_IMAGE_FALLBACKS: Array<{ pattern: RegExp; imageUrl: string }> = [
   { pattern: /보령.*머드|mud/i, imageUrl: "/images/boryeong_mud.png" },
   { pattern: /진해.*군항|군항제/i, imageUrl: "/images/jinhae_gunhangje.png" },
   { pattern: /곡성.*장미|세계장미/i, imageUrl: "/images/gokseong_roses_official.png" },
-  { pattern: /홍어|한우|꼴갑|갑오징어/i, imageUrl: "/images/kkolgap_festival.png" }
+  { pattern: /홍어|한우/i, imageUrl: "/images/youngeanpo_hongeo_hanu_festival.png" },
+  { pattern: /꼴갑|갑오징어/i, imageUrl: "/images/kkolgap_festival.png" }
 ];
 
 export function isUsableUrl(url?: string | null): url is string {
