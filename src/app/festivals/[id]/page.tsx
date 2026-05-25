@@ -106,84 +106,62 @@ export default async function FestivalDetailPage({ params }: PageProps) {
   const scoreDetails = getTrustScoreDetails(festival.trustScore);
   const hasRealPoster = festival.imageUrl && !isLikelyStockImage(festival.imageUrl);
 
-  const renderPlaceholder = () => {
-    let gradientClass = "from-slate-800 to-slate-950";
-    let icon = <ImageOff size={40} className="text-slate-400" />;
-    let textBadgeColor = "bg-slate-500/10 text-slate-400 border-slate-500/20";
-    
-    switch (festival.category) {
-      case "FOOD":
-        gradientClass = "from-amber-950 via-orange-950/70 to-slate-950";
-        icon = <Utensils size={44} className="text-amber-400/90" />;
-        textBadgeColor = "bg-amber-400/10 text-amber-400 border-amber-400/20";
-        break;
-      case "NATURE":
-        gradientClass = "from-emerald-950 via-teal-950/70 to-slate-950";
-        icon = <Trees size={44} className="text-emerald-400/90" />;
-        textBadgeColor = "bg-emerald-400/10 text-emerald-400 border-emerald-400/20";
-        break;
-      case "CULTURE":
-        gradientClass = "from-stone-900 via-amber-950/40 to-slate-950";
-        icon = <Compass size={44} className="text-amber-500/90" />;
-        textBadgeColor = "bg-amber-500/10 text-amber-500 border-amber-500/20";
-        break;
-      case "ART":
-        gradientClass = "from-rose-950 via-pink-950/70 to-slate-950";
-        icon = <Palette size={44} className="text-rose-400/90" />;
-        textBadgeColor = "bg-rose-400/10 text-rose-400 border-rose-400/20";
-        break;
-      case "MUSIC":
-        gradientClass = "from-violet-950 via-indigo-950/70 to-slate-950";
-        icon = <MusicIcon size={44} className="text-violet-400/90" />;
-        textBadgeColor = "bg-violet-400/10 text-violet-400 border-violet-400/20";
-        break;
-      case "OTHER":
-      default:
-        gradientClass = "from-blue-950 via-slate-900 to-slate-950";
-        icon = <Sparkles size={44} className="text-blue-400/90" />;
-        textBadgeColor = "bg-blue-400/10 text-blue-400 border-blue-400/20";
-        break;
-    }
-
-    return (
-      <div className={`relative flex h-[320px] md:h-[400px] w-full flex-col items-center justify-center p-8 text-center select-none overflow-hidden bg-gradient-to-b ${gradientClass}`}>
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_30px] pointer-events-none" />
-        <span className="absolute bottom-[-15%] right-[-5%] text-[10rem] font-black text-white/[0.01] tracking-tighter uppercase select-none">
-          {festival.category}
-        </span>
-        <div className="z-10 flex flex-col items-center gap-4">
-          <div className="rounded-3xl bg-white/[0.03] border border-white/[0.08] p-6 shadow-inner backdrop-blur-md">
-            {icon}
-          </div>
-          <div className="flex flex-col items-center gap-2 mt-2">
-            <span className="text-sm font-bold text-white/40 tracking-tight">공식 홍보 포스터 준비 중</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  let gradientClass = "from-slate-900 via-slate-950 to-background";
+  switch (festival.category) {
+    case "FOOD":
+      gradientClass = "from-amber-950/90 via-orange-950/60 to-background";
+      break;
+    case "NATURE":
+      gradientClass = "from-emerald-950/90 via-teal-950/60 to-background";
+      break;
+    case "CULTURE":
+      gradientClass = "from-stone-900/90 via-amber-950/30 to-background";
+      break;
+    case "ART":
+      gradientClass = "from-rose-950/90 via-pink-950/60 to-background";
+      break;
+    case "MUSIC":
+      gradientClass = "from-violet-950/90 via-indigo-950/60 to-background";
+      break;
+    case "OTHER":
+    default:
+      gradientClass = "from-blue-950/90 via-slate-900/60 to-background";
+      break;
+  }
 
   return (
     <div className="min-h-screen pb-20 relative bg-background">
 
-      {/* 1. 자이언트 히어로 배너 영역 - 화사하고 맑은 와이드 이미지 */}
-      <section className="relative h-[320px] md:h-[400px] w-full overflow-hidden border-b border-border/50 bg-background">
+      {/* 1. 자이언트 히어로 배너 영역 - 공식 이미지가 있을 때만 크게 노출 */}
+      <section className={`relative w-full overflow-hidden border-b border-border/50 ${
+        hasRealPoster 
+          ? "h-[320px] md:h-[400px] bg-background" 
+          : `h-[220px] md:h-[260px] bg-gradient-to-b ${gradientClass}`
+      }`}>
         {hasRealPoster ? (
-          <Image
-            src={festival.imageUrl!}
-            alt={festival.name}
-            width={1600}
-            height={600}
-            sizes="100vw"
-            priority
-            unoptimized
-            className="h-full w-full object-cover transition-transform duration-700"
-          />
+          <>
+            <Image
+              src={festival.imageUrl!}
+              alt={festival.name}
+              width={1600}
+              height={600}
+              sizes="100vw"
+              priority
+              unoptimized
+              className="h-full w-full object-cover transition-transform duration-700"
+            />
+            {/* 화사한 반투명 그라데이션 스크린 */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-black/25" />
+          </>
         ) : (
-          renderPlaceholder()
+          <>
+            {/* 세련된 미세 선 그리드 배킹 */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:16px_24px] pointer-events-none" />
+            <span className="absolute bottom-[-10%] right-[-2%] text-[6rem] md:text-[9rem] font-black text-white/[0.015] tracking-tighter uppercase select-none pointer-events-none">
+              {festival.category}
+            </span>
+          </>
         )}
-        {/* 화사한 반투명 그라데이션 스크린 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-black/25" />
         
         {/* 상단 액션 바 */}
         <div className="absolute top-6 left-4 md:left-8 z-20">
@@ -207,7 +185,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
           <h1 className="text-2xl md:text-4xl lg:text-4.5xl font-black text-white leading-tight tracking-tight drop-shadow-lg font-serif">
             {festival.name}
           </h1>
-          <p className="text-white/95 text-sm md:text-base max-w-2xl font-medium drop-shadow-md leading-relaxed font-serif">
+          <p className="text-white/95 text-sm md:text-base max-w-2xl font-medium drop-shadow-md leading-relaxed font-serif line-clamp-1">
             {festival.description || "이 동네 축제에 대한 따뜻한 소식들이 곧 채워질 예정입니다."}
           </p>
         </div>

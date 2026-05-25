@@ -305,13 +305,13 @@ export function FestivalFilters() {
       </aside>
 
       {/* 모바일 하단 플로팅 필터 트리거 */}
-      <div className="lg:hidden fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40">
+      <div className="lg:hidden fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 z-40">
         <button
           onClick={() => (document.getElementById("filter-dialog") as HTMLDialogElement)?.showModal()}
-          className="rounded-xl shadow-2xl bg-primary text-primary-foreground font-bold flex items-center space-x-1.5 px-5 py-3 text-base h-12 border border-primary hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          className="rounded-xl shadow-2xl bg-primary text-primary-foreground font-bold flex items-center space-x-1.5 px-4 py-3 text-base h-12 border border-primary hover:scale-105 active:scale-95 transition-all cursor-pointer"
         >
           <SlidersHorizontal size={18} />
-          <span>상세 조건</span>
+          <span>필터</span>
         </button>
       </div>
 

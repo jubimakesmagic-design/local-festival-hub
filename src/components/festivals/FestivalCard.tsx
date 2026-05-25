@@ -22,7 +22,7 @@ import {
   ImageOff
 } from "lucide-react";
 import { FestivalStatusBadge } from "./FestivalStatusBadge";
-import { CATEGORY_FALLBACK_IMAGES, isLikelyStockImage } from "@/lib/collectors/quality";
+import { isLikelyStockImage } from "@/lib/collectors/quality";
 
 export interface FestivalCardProps {
   festival: {
@@ -72,70 +72,34 @@ export function FestivalCard({ festival }: FestivalCardProps) {
   const hasRealPoster = festival.imageUrl && !isLikelyStockImage(festival.imageUrl);
   const formattedCategory = categoryLabels[festival.category] || festival.category;
 
-  const renderPlaceholder = () => {
-    let gradientClass = "from-slate-800 to-slate-950";
-    let icon = <ImageOff size={28} className="text-slate-400" />;
-    let textBadgeColor = "bg-slate-500/10 text-slate-400 border-slate-500/20";
-    
-    switch (festival.category) {
-      case "FOOD":
-        gradientClass = "from-amber-950 via-orange-950/70 to-slate-950";
-        icon = <Utensils size={32} className="text-amber-400/90" />;
-        textBadgeColor = "bg-amber-400/10 text-amber-400 border-amber-400/20";
-        break;
-      case "NATURE":
-        gradientClass = "from-emerald-950 via-teal-950/70 to-slate-950";
-        icon = <Trees size={32} className="text-emerald-400/90" />;
-        textBadgeColor = "bg-emerald-400/10 text-emerald-400 border-emerald-400/20";
-        break;
-      case "CULTURE":
-        gradientClass = "from-stone-900 via-amber-950/40 to-slate-950";
-        icon = <Compass size={32} className="text-amber-500/90" />;
-        textBadgeColor = "bg-amber-500/10 text-amber-500 border-amber-500/20";
-        break;
-      case "ART":
-        gradientClass = "from-rose-950 via-pink-950/70 to-slate-950";
-        icon = <Palette size={32} className="text-rose-400/90" />;
-        textBadgeColor = "bg-rose-400/10 text-rose-400 border-rose-400/20";
-        break;
-      case "MUSIC":
-        gradientClass = "from-violet-950 via-indigo-950/70 to-slate-950";
-        icon = <MusicIcon size={32} className="text-violet-400/90" />;
-        textBadgeColor = "bg-violet-400/10 text-violet-400 border-violet-400/20";
-        break;
-      case "OTHER":
-      default:
-        gradientClass = "from-blue-950 via-slate-900 to-slate-950";
-        icon = <Sparkles size={32} className="text-blue-400/90" />;
-        textBadgeColor = "bg-blue-400/10 text-blue-400 border-blue-400/20";
-        break;
-    }
-
-    return (
-      <div className={`relative flex h-full w-full flex-col items-center justify-center p-6 text-center select-none overflow-hidden transition-transform duration-500 group-hover:scale-105 bg-gradient-to-b ${gradientClass}`}>
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
-        <span className="absolute bottom-[-10%] right-[-5%] text-[5rem] font-black text-white/[0.02] tracking-tighter uppercase select-none">
-          {festival.category}
-        </span>
-        <div className="z-10 flex flex-col items-center gap-3">
-          <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 shadow-inner backdrop-blur-sm">
-            {icon}
-          </div>
-          <div className="flex flex-col items-center gap-1.5 mt-1">
-            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider border uppercase ${textBadgeColor}`}>
-              {formattedCategory}
-            </span>
-            <span className="text-xs font-bold text-white/40 tracking-tight">공식 포스터 준비중</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // Slim gradient for image-less headers to save screen real estate
+  let gradientClass = "from-slate-500/5 to-slate-500/10";
+  switch (festival.category) {
+    case "FOOD":
+      gradientClass = "from-amber-500/10 to-orange-500/5";
+      break;
+    case "NATURE":
+      gradientClass = "from-emerald-500/10 to-teal-500/5";
+      break;
+    case "CULTURE":
+      gradientClass = "from-stone-500/15 to-amber-700/5";
+      break;
+    case "ART":
+      gradientClass = "from-rose-500/10 to-pink-500/5";
+      break;
+    case "MUSIC":
+      gradientClass = "from-violet-500/10 to-fuchsia-500/5";
+      break;
+    case "OTHER":
+    default:
+      gradientClass = "from-blue-500/10 to-indigo-500/5";
+      break;
+  }
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-        {hasRealPoster ? (
+      {hasRealPoster ? (
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
           <Image
             src={festival.imageUrl!}
             alt={festival.name}
@@ -145,21 +109,30 @@ export function FestivalCard({ festival }: FestivalCardProps) {
             unoptimized
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-        ) : (
-          renderPlaceholder()
-        )}
 
-        {festival.trustScore >= 80 && (
-          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-card/95 px-2.5 py-1 text-xs font-bold text-accent shadow-sm">
-            <CheckCircle2 size={14} className="shrink-0" />
-            <span>검증됨</span>
+          {festival.trustScore >= 80 && (
+            <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-card/95 px-2.5 py-1 text-xs font-bold text-accent shadow-sm">
+              <CheckCircle2 size={14} className="shrink-0" />
+              <span>검증됨</span>
+            </div>
+          )}
+
+          <div className="absolute bottom-3 left-3">
+            <FestivalStatusBadge startDate={festival.startDate} endDate={festival.endDate} />
           </div>
-        )}
-
-        <div className="absolute bottom-3 left-3">
-          <FestivalStatusBadge startDate={festival.startDate} endDate={festival.endDate} />
         </div>
-      </div>
+      ) : (
+        /* Extremely compact status bar to eliminate dead space when there is no image */
+        <div className={`relative h-14 w-full border-b border-border/40 bg-gradient-to-r ${gradientClass} flex items-center justify-between px-3.5 sm:px-4 shrink-0`}>
+          <FestivalStatusBadge startDate={festival.startDate} endDate={festival.endDate} />
+          {festival.trustScore >= 80 && (
+            <div className="flex items-center gap-1 rounded-full bg-card/90 border border-accent/25 px-2.5 py-1 text-xs font-bold text-accent shadow-sm">
+              <CheckCircle2 size={14} className="shrink-0" />
+              <span>검증됨</span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col p-3.5 sm:p-4">
         <div className="flex-1">
