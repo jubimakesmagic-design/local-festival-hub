@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { CalendarRange, Check, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 
 export function FestivalFilters() {
   const router = useRouter();
@@ -12,11 +12,13 @@ export function FestivalFilters() {
   const currentRegion = searchParams.get("region") || "all";
   const currentCategory = searchParams.get("category") || "all";
   const currentMonth = searchParams.get("month") || "all";
+  const currentStart = searchParams.get("start") || "";
+  const currentEnd = searchParams.get("end") || "";
   const hasParking = searchParams.get("parking") === "true";
   const hasShuttle = searchParams.get("shuttle") === "true";
   const isPetFriendly = searchParams.get("pet") === "true";
   const isChildFriendly = searchParams.get("child") === "true";
-  const currentProgress = searchParams.get("progress") || "active";
+  const currentProgress = searchParams.get("progress") || (currentStart || currentEnd ? "all" : "active");
 
   const regions = [
     { value: "all", label: "전국 전체" },
@@ -66,8 +68,6 @@ export function FestivalFilters() {
   const updateFilterParam = (key: string, value: string | boolean) => {
     const params = new URLSearchParams(searchParams.toString());
     
-    // progress의 경우 기본값이 'active'이므로 active 또는 false/빈값인 경우 파라미터 삭제
-    const isDefault = value === "all" || value === "active" || value === false || value === "";
     if (key === "progress") {
       if (value === "active") {
         params.delete(key);
@@ -82,6 +82,28 @@ export function FestivalFilters() {
       }
     }
     
+    router.push(`/?${params.toString()}`);
+  };
+
+  const updateDateRange = (key: "start" | "end", value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value) {
+      params.set(key, value);
+      if (!searchParams.has("progress")) {
+        params.delete("progress");
+      }
+    } else {
+      params.delete(key);
+    }
+
+    router.push(`/?${params.toString()}`);
+  };
+
+  const clearDateRange = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("start");
+    params.delete("end");
     router.push(`/?${params.toString()}`);
   };
 
@@ -136,6 +158,46 @@ export function FestivalFilters() {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* 원하는 날짜 범위 필터 */}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <h5 className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground">
+            <CalendarRange size={16} className="text-primary" />
+            <span>날짜 범위</span>
+          </h5>
+          {(currentStart || currentEnd) && (
+            <button
+              type="button"
+              onClick={clearDateRange}
+              className="inline-flex min-h-9 items-center gap-1 rounded border border-border bg-background px-2.5 text-xs font-bold text-muted-foreground transition hover:text-foreground"
+            >
+              <X size={14} />
+              지우기
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          <label className="space-y-1.5">
+            <span className="block text-xs font-bold text-muted-foreground">시작일</span>
+            <input
+              type="date"
+              value={currentStart}
+              onChange={(e) => updateDateRange("start", e.target.value)}
+              className="h-12 w-full rounded border border-border bg-background px-3 text-base font-bold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            />
+          </label>
+          <label className="space-y-1.5">
+            <span className="block text-xs font-bold text-muted-foreground">종료일</span>
+            <input
+              type="date"
+              value={currentEnd}
+              onChange={(e) => updateDateRange("end", e.target.value)}
+              className="h-12 w-full rounded border border-border bg-background px-3 text-base font-bold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            />
+          </label>
         </div>
       </div>
 
@@ -243,20 +305,20 @@ export function FestivalFilters() {
       </aside>
 
       {/* 모바일 하단 플로팅 필터 트리거 */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+      <div className="lg:hidden fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-40">
         <button
           onClick={() => (document.getElementById("filter-dialog") as HTMLDialogElement)?.showModal()}
-          className="rounded-xl shadow-2xl bg-primary text-primary-foreground font-bold flex items-center space-x-1.5 px-6 py-3.5 text-base h-14 border border-primary hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          className="rounded-xl shadow-2xl bg-primary text-primary-foreground font-bold flex items-center space-x-1.5 px-5 py-3 text-base h-12 border border-primary hover:scale-105 active:scale-95 transition-all cursor-pointer"
         >
           <SlidersHorizontal size={18} />
-          <span>상세 조건 필터</span>
+          <span>상세 조건</span>
         </button>
       </div>
 
       {/* 모바일 전용 네이티브 바텀시트 <dialog> */}
       <dialog
         id="filter-dialog"
-        className="lg:hidden fixed inset-x-0 bottom-0 top-auto m-0 w-full rounded-t-3xl max-h-[85vh] bg-card border-t border-border shadow-2xl p-5 focus:outline-none backdrop:bg-black/50 backdrop:backdrop-blur-sm animate-slide-down overflow-y-auto"
+        className="lg:hidden fixed inset-x-0 bottom-0 top-auto m-0 w-full rounded-t-2xl max-h-[92dvh] bg-card border-t border-border shadow-2xl p-4 focus:outline-none backdrop:bg-black/50 backdrop:backdrop-blur-sm animate-slide-down overflow-y-auto"
       >
         <div className="flex flex-col h-full">
           {/* 드로어 헤더 */}
@@ -267,13 +329,14 @@ export function FestivalFilters() {
             </h4>
             <button
               onClick={() => (document.getElementById("filter-dialog") as HTMLDialogElement)?.close()}
-              className="h-10 w-10 rounded bg-secondary flex items-center justify-center font-bold text-muted-foreground hover:text-foreground active:scale-90 transition-transform cursor-pointer text-lg"
+              className="h-10 w-10 rounded bg-secondary flex items-center justify-center font-bold text-muted-foreground hover:text-foreground active:scale-90 transition-transform cursor-pointer"
+              aria-label="필터 닫기"
             >
-              ✕
+              <X size={20} />
             </button>
           </div>
           {/* 드로어 컨텐츠 */}
-          <div className="flex-1 overflow-y-auto pb-10">{filterContent}</div>
+          <div className="flex-1 overflow-y-auto pb-[calc(4rem+env(safe-area-inset-bottom))]">{filterContent}</div>
         </div>
       </dialog>
     </>

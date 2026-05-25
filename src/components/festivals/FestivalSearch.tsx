@@ -40,15 +40,15 @@ export function FestivalSearch() {
         enterKeyHint="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="🔍 축제 이름이나 지역을 입력하세요"
-        className="pl-12 pr-24 bg-background/50 border-border/80 !h-14 !text-base"
+        placeholder="축제 이름, 지역 검색"
+        className="pl-11 pr-20 bg-background/50 border-border/80 !h-12 !text-base sm:!h-14 sm:pr-24"
       />
       <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-muted-foreground/60">
-        <Search size={20} />
+        <Search size={19} />
       </div>
       <button
         type="submit"
-        className="absolute right-2 top-2 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-base font-bold hover:bg-primary/90 transition-all cursor-pointer"
+        className="absolute right-1.5 top-1.5 h-10 px-3.5 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-all cursor-pointer sm:right-2 sm:top-2 sm:px-5 sm:text-base"
       >
         검색
       </button>

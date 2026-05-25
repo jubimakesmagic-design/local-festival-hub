@@ -21,6 +21,8 @@ export default async function Home({ searchParams }: PageProps) {
   const category = typeof resolvedParams.category === "string" ? resolvedParams.category : "all";
   const month = typeof resolvedParams.month === "string" ? resolvedParams.month : "all";
   const sort = typeof resolvedParams.sort === "string" ? resolvedParams.sort : "trust";
+  const rangeStart = typeof resolvedParams.start === "string" ? resolvedParams.start : "";
+  const rangeEnd = typeof resolvedParams.end === "string" ? resolvedParams.end : "";
 
   const hasParking = resolvedParams.parking === "true";
   const hasShuttle = resolvedParams.shuttle === "true";
@@ -31,6 +33,7 @@ export default async function Home({ searchParams }: PageProps) {
   const where: Prisma.FestivalWhereInput = {
     status: "VERIFIED", // 일반 화면은 검수 완료된 건만 표시
   };
+  const andConditions: Prisma.FestivalWhereInput[] = [];
 
   // 1. 검색어 필터 (이름, 설명, 지역, 주소 및 관련 상세 프로그램/초대가수 명칭 포함 여부)
   if (q) {
@@ -76,25 +79,56 @@ export default async function Home({ searchParams }: PageProps) {
       const lastDay = new Date(2026, mNum, 0).getDate();
       const startOfMonth = new Date(`2026-${pad(mNum)}-01T00:00:00+09:00`);
       const endOfMonth = new Date(`2026-${pad(mNum)}-${pad(lastDay)}T23:59:59+09:00`);
-      where.startDate = { lte: endOfMonth };
-      where.endDate = { gte: startOfMonth };
+      andConditions.push({
+        startDate: { lte: endOfMonth },
+        endDate: { gte: startOfMonth },
+      });
     }
   }
 
-  // 6. 진행 상태 필터 (progress)
-  // 기본값: 'active' (지난 축제는 기본적으로 검색결과에서 숨김 세팅)
-  const progress = typeof resolvedParams.progress === "string" ? resolvedParams.progress : "active";
+  // 6. 날짜 범위 필터 (선택한 기간과 축제 기간이 하루라도 겹치면 노출)
+  const parseDateInput = (value: string, endOfDay = false) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    return new Date(`${value}T${endOfDay ? "23:59:59" : "00:00:00"}+09:00`);
+  };
+
+  const parsedStart = parseDateInput(rangeStart);
+  const parsedEnd = parseDateInput(rangeEnd, true);
+  if (parsedStart || parsedEnd) {
+    let searchStart = parsedStart ?? parseDateInput(rangeEnd)!;
+    let searchEnd = parsedEnd ?? parseDateInput(rangeStart, true)!;
+
+    if (searchStart > searchEnd) {
+      [searchStart, searchEnd] = [searchEnd, searchStart];
+    }
+
+    andConditions.push({
+      startDate: { lte: searchEnd },
+      endDate: { gte: searchStart },
+    });
+  }
+
+  // 7. 진행 상태 필터 (progress)
+  // 날짜 범위 검색 중에는 기본값을 전체로 두어 과거 날짜도 검색 가능합니다.
+  const progressDefault = parsedStart || parsedEnd ? "all" : "active";
+  const progress = typeof resolvedParams.progress === "string" ? resolvedParams.progress : progressDefault;
   const demoToday = new Date("2026-05-25T17:39:43+09:00");
 
   if (progress === "active") {
-    where.endDate = { gte: demoToday };
+    andConditions.push({ endDate: { gte: demoToday } });
   } else if (progress === "ongoing") {
-    where.startDate = { lte: demoToday };
-    where.endDate = { gte: demoToday };
+    andConditions.push({
+      startDate: { lte: demoToday },
+      endDate: { gte: demoToday },
+    });
   } else if (progress === "upcoming") {
-    where.startDate = { gt: demoToday };
+    andConditions.push({ startDate: { gt: demoToday } });
   } else if (progress === "ended") {
-    where.endDate = { lt: demoToday };
+    andConditions.push({ endDate: { lt: demoToday } });
+  }
+
+  if (andConditions.length > 0) {
+    where.AND = andConditions;
   }
 
   // --- 정렬 조건 조립 ---
@@ -127,12 +161,12 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 md:px-6 md:py-10">
+      <div className="container mx-auto px-3 py-5 pb-24 md:px-6 md:py-10 md:pb-10">
         
-        <section className="mb-8 rounded-lg border border-border bg-card p-5 shadow-sm md:p-7">
+        <section className="hidden md:block mb-5 rounded-lg border border-border bg-card p-4 shadow-sm md:mb-8 md:p-7">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3.5 py-1.5 text-sm font-bold text-primary">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-sm font-bold text-primary">
                 <Database size={16} />
                 전국 축제 통합 수집
               </div>
@@ -140,12 +174,12 @@ export default async function Home({ searchParams }: PageProps) {
                 공식 출처와 실제 이미지를 우선한 축제 탐색
                 믿을 수 있는 축제 정보만 모았습니다
               </h1>
-              <p className="text-base leading-relaxed text-muted-foreground">
+              <p className="text-[0.95rem] leading-7 text-muted-foreground md:text-base">
                 한국관광공사, 지자체, 지역 언론, 사용자 제보를 교차 수집하고 깨진 출처와 범용 스톡 이미지는 걸러냅니다.
               </p>
             </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full md:w-auto md:min-w-[400px]">
+             <div className="grid w-full grid-cols-3 gap-2 md:w-auto md:min-w-[400px] md:gap-3">
               {[
                 { label: "검색 결과", value: totalCount, icon: Database },
                 { label: "진행 중", value: activeCount, icon: CalendarDays },
@@ -153,12 +187,12 @@ export default async function Home({ searchParams }: PageProps) {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.label} className="rounded-xl border border-border bg-background p-4 flex md:flex-col items-center md:items-start justify-between md:justify-center gap-3">
-                    <div className="flex items-center gap-2">
+                  <div key={stat.label} className="flex min-h-24 flex-col items-start justify-between gap-2 rounded-lg border border-border bg-background p-3 md:justify-center md:gap-3 md:p-4">
+                    <div className="flex items-center gap-1.5">
                       <Icon size={18} className="text-primary shrink-0" />
-                      <span className="block text-sm font-bold text-muted-foreground">{stat.label}</span>
+                      <span className="block text-xs font-bold leading-snug text-muted-foreground md:text-sm">{stat.label}</span>
                     </div>
-                    <strong className="block text-2xl font-extrabold text-foreground">{stat.value}개</strong>
+                    <strong className="block text-xl font-extrabold text-foreground md:text-2xl">{stat.value}개</strong>
                   </div>
                 );
               })}
@@ -166,15 +200,15 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        <section className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm md:p-5">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <section className="mb-5 rounded-lg border border-border bg-card p-3 shadow-sm md:mb-6 md:p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
             <div className="w-full md:flex-1">
               <Suspense fallback={<div className="h-10 bg-muted/20 animate-pulse rounded-lg" />}>
                 <FestivalSearch />
               </Suspense>
             </div>
-            <div className="flex w-full md:w-auto items-center justify-between md:justify-end gap-4 shrink-0">
-              <span className="text-sm md:text-base font-bold text-muted-foreground shrink-0">
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between md:w-auto md:justify-end md:gap-4 shrink-0">
+              <span className="text-sm font-bold text-muted-foreground md:text-base shrink-0">
                 총 {totalCount}개의 축제 표시
               </span>
               <Suspense fallback={<div className="h-10 w-48 bg-muted/20 animate-pulse rounded-lg" />}>

@@ -20,8 +20,16 @@ import {
   ShieldCheck, 
   Clock, 
   Info,
-  ExternalLink
+  ExternalLink,
+  Utensils, 
+  Trees, 
+  Compass, 
+  Palette, 
+  Music as MusicIcon, 
+  Sparkles, 
+  ImageOff
 } from "lucide-react";
+import { isLikelyStockImage } from "@/lib/collectors/quality";
 
 export interface PageProps {
   params: Promise<{ id: string }>;
@@ -96,25 +104,84 @@ export default async function FestivalDetailPage({ params }: PageProps) {
   };
 
   const scoreDetails = getTrustScoreDetails(festival.trustScore);
+  const hasRealPoster = festival.imageUrl && !isLikelyStockImage(festival.imageUrl);
 
-  const defaultImage = "/images/gokseong_roses.png";
-  const heroImage = festival.imageUrl || defaultImage;
+  const renderPlaceholder = () => {
+    let gradientClass = "from-slate-800 to-slate-950";
+    let icon = <ImageOff size={40} className="text-slate-400" />;
+    let textBadgeColor = "bg-slate-500/10 text-slate-400 border-slate-500/20";
+    
+    switch (festival.category) {
+      case "FOOD":
+        gradientClass = "from-amber-950 via-orange-950/70 to-slate-950";
+        icon = <Utensils size={44} className="text-amber-400/90" />;
+        textBadgeColor = "bg-amber-400/10 text-amber-400 border-amber-400/20";
+        break;
+      case "NATURE":
+        gradientClass = "from-emerald-950 via-teal-950/70 to-slate-950";
+        icon = <Trees size={44} className="text-emerald-400/90" />;
+        textBadgeColor = "bg-emerald-400/10 text-emerald-400 border-emerald-400/20";
+        break;
+      case "CULTURE":
+        gradientClass = "from-stone-900 via-amber-950/40 to-slate-950";
+        icon = <Compass size={44} className="text-amber-500/90" />;
+        textBadgeColor = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        break;
+      case "ART":
+        gradientClass = "from-rose-950 via-pink-950/70 to-slate-950";
+        icon = <Palette size={44} className="text-rose-400/90" />;
+        textBadgeColor = "bg-rose-400/10 text-rose-400 border-rose-400/20";
+        break;
+      case "MUSIC":
+        gradientClass = "from-violet-950 via-indigo-950/70 to-slate-950";
+        icon = <MusicIcon size={44} className="text-violet-400/90" />;
+        textBadgeColor = "bg-violet-400/10 text-violet-400 border-violet-400/20";
+        break;
+      case "OTHER":
+      default:
+        gradientClass = "from-blue-950 via-slate-900 to-slate-950";
+        icon = <Sparkles size={44} className="text-blue-400/90" />;
+        textBadgeColor = "bg-blue-400/10 text-blue-400 border-blue-400/20";
+        break;
+    }
+
+    return (
+      <div className={`relative flex h-[320px] md:h-[400px] w-full flex-col items-center justify-center p-8 text-center select-none overflow-hidden bg-gradient-to-b ${gradientClass}`}>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_30px] pointer-events-none" />
+        <span className="absolute bottom-[-15%] right-[-5%] text-[10rem] font-black text-white/[0.01] tracking-tighter uppercase select-none">
+          {festival.category}
+        </span>
+        <div className="z-10 flex flex-col items-center gap-4">
+          <div className="rounded-3xl bg-white/[0.03] border border-white/[0.08] p-6 shadow-inner backdrop-blur-md">
+            {icon}
+          </div>
+          <div className="flex flex-col items-center gap-2 mt-2">
+            <span className="text-sm font-bold text-white/40 tracking-tight">공식 홍보 포스터 준비 중</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen pb-20 relative bg-background">
 
       {/* 1. 자이언트 히어로 배너 영역 - 화사하고 맑은 와이드 이미지 */}
       <section className="relative h-[320px] md:h-[400px] w-full overflow-hidden border-b border-border/50 bg-background">
-        <Image
-          src={heroImage}
-          alt={festival.name}
-          width={1600}
-          height={600}
-          sizes="100vw"
-          priority
-          unoptimized
-          className="h-full w-full object-cover transition-transform duration-700"
-        />
+        {hasRealPoster ? (
+          <Image
+            src={festival.imageUrl!}
+            alt={festival.name}
+            width={1600}
+            height={600}
+            sizes="100vw"
+            priority
+            unoptimized
+            className="h-full w-full object-cover transition-transform duration-700"
+          />
+        ) : (
+          renderPlaceholder()
+        )}
         {/* 화사한 반투명 그라데이션 스크린 */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-black/25" />
         
