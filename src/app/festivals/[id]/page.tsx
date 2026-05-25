@@ -226,26 +226,63 @@ export default async function FestivalDetailPage({ params }: PageProps) {
               </h3>
 
               {festival.programs && festival.programs.length > 0 ? (
-                <div className="overflow-hidden border border-border/60 rounded-xl">
-                  <table className="w-full text-sm font-semibold border-collapse text-left bg-background/10">
-                    <thead className="bg-secondary/70 text-sm font-bold text-muted-foreground border-b border-border/60">
-                      <tr>
-                        <th className="px-4 py-3.5 w-[120px]">시간</th>
-                        <th className="px-4 py-3.5 w-[200px]">프로그램</th>
-                        <th className="px-4 py-3.5">내용</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/40 text-sm font-medium">
-                      {festival.programs.map((prog) => (
-                        <tr key={prog.id} className="hover:bg-secondary/30 transition-colors">
-                          <td className="px-4 py-3.5 font-bold font-typewriter text-primary">{prog.time || "상시 운영"}</td>
-                          <td className="px-4 py-3.5 font-bold text-foreground font-serif">{prog.name}</td>
-                          <td className="px-4 py-3.5 text-muted-foreground leading-relaxed">{prog.content || "-"}</td>
+                <>
+                  {/* 1. 데스크톱 뷰: 표 형식 테이블 */}
+                  <div className="hidden md:block overflow-hidden border border-border/60 rounded-xl">
+                    <table className="w-full text-sm font-semibold border-collapse text-left bg-background/10">
+                      <thead className="bg-secondary/70 text-sm font-bold text-muted-foreground border-b border-border/60">
+                        <tr>
+                          <th className="px-4 py-3.5 w-[120px]">시간</th>
+                          <th className="px-4 py-3.5 w-[200px]">프로그램</th>
+                          <th className="px-4 py-3.5">내용</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-border/40 text-sm font-medium">
+                        {festival.programs.map((prog) => (
+                          <tr key={prog.id} className="hover:bg-secondary/30 transition-colors">
+                            <td className="px-4 py-3.5 font-bold text-primary">{prog.time || "상시 운영"}</td>
+                            <td className="px-4 py-3.5 font-bold text-foreground font-serif">{prog.name}</td>
+                            <td className="px-4 py-3.5 text-muted-foreground leading-relaxed">{prog.content || "-"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* 2. 모바일 뷰: 어르신 친화 카드형 타임라인 (기본 3개 노출, 초과 시 '더보기' 접이식) */}
+                  <div className="block md:hidden space-y-3">
+                    {festival.programs.slice(0, 3).map((prog) => (
+                      <div key={prog.id} className="border border-border/60 bg-background p-4 rounded-xl space-y-2 text-left">
+                        <div className="flex items-center">
+                          <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-md">{prog.time || "상시 운영"}</span>
+                        </div>
+                        <h4 className="text-base font-extrabold text-foreground font-serif">{prog.name}</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{prog.content || "-"}</p>
+                      </div>
+                    ))}
+
+                    {festival.programs.length > 3 && (
+                      <details className="group w-full">
+                        <summary className="list-none cursor-pointer focus:outline-none">
+                          <div className="flex items-center justify-center h-12 w-full bg-secondary hover:bg-secondary/80 text-primary font-bold rounded-xl text-sm transition-all group-open:hidden cursor-pointer select-none">
+                            📋 세부 일정 더보기 ({festival.programs.length - 3}개 더 있음)
+                          </div>
+                        </summary>
+                        <div className="space-y-3 mt-3">
+                          {festival.programs.slice(3).map((prog) => (
+                            <div key={prog.id} className="border border-border/60 bg-background p-4 rounded-xl space-y-2 text-left animate-slide-up">
+                              <div className="flex items-center">
+                                <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-md">{prog.time || "상시 운영"}</span>
+                              </div>
+                              <h4 className="text-base font-extrabold text-foreground font-serif">{prog.name}</h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{prog.content || "-"}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                </>
               ) : (
                 <div className="border border-dashed border-border rounded-xl p-8 text-center text-sm text-muted-foreground/80 bg-secondary/10">
                   <p className="font-bold mb-1">상세 일정 정보가 기입되지 않았습니다.</p>

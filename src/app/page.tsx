@@ -82,17 +82,19 @@ export default async function Home({ searchParams }: PageProps) {
   }
 
   // 6. 진행 상태 필터 (progress)
-  const progress = typeof resolvedParams.progress === "string" ? resolvedParams.progress : "all";
-  if (progress !== "all") {
-    const today = new Date();
-    if (progress === "ongoing") {
-      where.startDate = { lte: today };
-      where.endDate = { gte: today };
-    } else if (progress === "upcoming") {
-      where.startDate = { gt: today };
-    } else if (progress === "ended") {
-      where.endDate = { lt: today };
-    }
+  // 기본값: 'active' (지난 축제는 기본적으로 검색결과에서 숨김 세팅)
+  const progress = typeof resolvedParams.progress === "string" ? resolvedParams.progress : "active";
+  const demoToday = new Date("2026-05-25T17:39:43+09:00");
+
+  if (progress === "active") {
+    where.endDate = { gte: demoToday };
+  } else if (progress === "ongoing") {
+    where.startDate = { lte: demoToday };
+    where.endDate = { gte: demoToday };
+  } else if (progress === "upcoming") {
+    where.startDate = { gt: demoToday };
+  } else if (progress === "ended") {
+    where.endDate = { lt: demoToday };
   }
 
   // --- 정렬 조건 조립 ---

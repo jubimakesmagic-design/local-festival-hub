@@ -16,7 +16,7 @@ export function FestivalFilters() {
   const hasShuttle = searchParams.get("shuttle") === "true";
   const isPetFriendly = searchParams.get("pet") === "true";
   const isChildFriendly = searchParams.get("child") === "true";
-  const currentProgress = searchParams.get("progress") || "all";
+  const currentProgress = searchParams.get("progress") || "active";
 
   const regions = [
     { value: "all", label: "전국 전체" },
@@ -55,7 +55,8 @@ export function FestivalFilters() {
   ];
 
   const progressOptions = [
-    { value: "all", label: "전체 상태" },
+    { value: "active", label: "✨ 진행 중 및 예정" },
+    { value: "all", label: "전체 축제 (지난 축제 포함)" },
     { value: "ongoing", label: "🟢 진행 중" },
     { value: "upcoming", label: "⏳ 진행 예정" },
     { value: "ended", label: "⚫️ 종료됨" }
@@ -65,10 +66,20 @@ export function FestivalFilters() {
   const updateFilterParam = (key: string, value: string | boolean) => {
     const params = new URLSearchParams(searchParams.toString());
     
-    if (value === "all" || value === false || value === "") {
-      params.delete(key);
+    // progress의 경우 기본값이 'active'이므로 active 또는 false/빈값인 경우 파라미터 삭제
+    const isDefault = value === "all" || value === "active" || value === false || value === "";
+    if (key === "progress") {
+      if (value === "active") {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
     } else {
-      params.set(key, String(value));
+      if (value === "all" || value === false || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
     }
     
     router.push(`/?${params.toString()}`);
