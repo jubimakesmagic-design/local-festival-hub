@@ -36,6 +36,8 @@ export function FestivalSearch() {
   return (
     <form onSubmit={handleSearchSubmit} className="relative w-full">
       <Input
+        type="search"
+        enterKeyHint="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="🔍 축제 이름이나 지역을 입력하세요"
