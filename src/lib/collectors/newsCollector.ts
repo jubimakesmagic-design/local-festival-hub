@@ -231,7 +231,7 @@ ${items.join("\n\n")}
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "http://www.gjdailynews.co.kr/news/articleView.html?idxno=20260619"
+        sourceUrl: "http://www.busanportfestival.kr"
       },
       {
         name: "제28회 제주 들불축제",
@@ -241,14 +241,14 @@ ${items.join("\n\n")}
         startDate: new Date("2026-03-12T14:00:00+09:00"),
         endDate: new Date("2026-03-15T21:00:00+09:00"),
         category: "CULTURE",
-        officialUrl: "https://www.jejurelease.or.kr",
+        officialUrl: "https://www.jeju.go.kr/culture",
         imageUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: true,
         isPetFriendly: false,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "http://www.gjdailynews.co.kr/news/articleView.html?idxno=20260312"
+        sourceUrl: "https://www.jeju.go.kr/culture"
       },
       {
         name: "2026 영암 왕인문화축제",
@@ -265,7 +265,7 @@ ${items.join("\n\n")}
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "http://www.gjdailynews.co.kr/news/articleView.html?idxno=20260402"
+        sourceUrl: "http://www.yeongam.go.kr/home/plaza"
       },
       {
         name: "2026 부산국제록페스티벌",
@@ -282,7 +282,7 @@ ${items.join("\n\n")}
         isPetFriendly: false,
         isChildFriendly: false,
         sourceName: this.sourceName,
-        sourceUrl: "http://www.gjdailynews.co.kr/news/articleView.html?idxno=20261002"
+        sourceUrl: "https://www.busanrockfestival.com"
       },
       {
         name: "제44회 단양 소백산 철쭉제",
@@ -299,7 +299,7 @@ ${items.join("\n\n")}
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "http://www.gjdailynews.co.kr/news/articleView.html?idxno=20260521"
+        sourceUrl: "https://www.danyang.go.kr"
       }
     ];
 

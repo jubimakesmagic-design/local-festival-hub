@@ -20,17 +20,17 @@ export function SiteHeader() {
       <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* 로고 영역 - 아날로그 수공예 🧭 소인 */}
         <Link href="/" className="flex items-center space-x-2.5 group">
-          <div className="h-9 w-9 stamp-badge flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-            <Compass size={18} className="text-primary" />
+          <div className="h-11 w-11 stamp-badge flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+            <Compass size={22} className="text-primary" />
           </div>
-          <span className="font-extrabold text-xl tracking-tight font-serif text-foreground">
+          <span className="font-extrabold text-2xl tracking-tight font-serif text-foreground">
             동네축제
           </span>
         </Link>
 
         {/* 네비게이션 및 테마 스위처 */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          <nav className="flex items-center space-x-1 sm:space-x-2">
+          <nav className="flex items-center space-x-1.5 sm:space-x-2">
             {links.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -38,14 +38,14 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold transition-all duration-200 border border-dashed rounded ${
+                  className={`flex items-center space-x-2 px-3.5 py-2.5 text-sm font-bold transition-all duration-200 border border-dashed rounded-xl min-h-[44px] ${
                     isActive
                       ? "bg-card text-primary border-primary/50 stamp-badge"
                       : "text-muted-foreground border-transparent hover:border-border hover:bg-secondary/40 hover:text-foreground"
                   }`}
                 >
-                  <Icon size={13} className="shrink-0" />
-                  <span className="hidden sm:inline">{link.label}</span>
+                  <Icon size={16} className="shrink-0" />
+                  <span className="hidden md:inline">{link.label}</span>
                 </Link>
               );
             })}

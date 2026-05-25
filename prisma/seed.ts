@@ -1,5 +1,6 @@
 // prisma/seed.ts
 import { PrismaClient } from "@prisma/client";
+import { seedMassFestivals } from './mass-festivals';
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import path from "path";
 import { isLikelyStockImage, normalizeOfficialUrl, normalizeSourceUrl, pickFestivalImage } from "../src/lib/collectors/quality";
@@ -99,7 +100,7 @@ async function main() {
       startDate: new Date("2026-05-20T09:00:00+09:00"),
       endDate: new Date("2026-06-07T18:00:00+09:00"),
       category: "NATURE",
-      officialUrl: "http://www.yongsoogol.co.kr",
+      officialUrl: "https://poppystore.modoo.at",
       imageUrl: "https://images.unsplash.com/photo-1461988310307-d11d0b9e4a35?w=800&auto=format&fit=crop",
       hasParking: true,
       hasShuttle: false,
@@ -111,7 +112,7 @@ async function main() {
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "용수골 꽃양귀비마을 공식 사이트", url: "http://www.yongsoogol.co.kr", type: "LOCAL_GOV" }
+          { name: "용수골 꽃양귀비마을 공식 사이트", url: "https://poppystore.modoo.at", type: "LOCAL_GOV" }
         ]
       },
       programs: {
@@ -307,7 +308,7 @@ async function main() {
       startDate: new Date("2026-05-01T09:00:00+09:00"),
       endDate: new Date("2026-05-05T18:00:00+09:00"),
       category: "CULTURE",
-      officialUrl: "http://dahyang.boseong.go.kr",
+      officialUrl: "https://teafestival.clickn.co.kr",
       imageUrl: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=800&auto=format&fit=crop",
       hasParking: true,
       hasShuttle: true,
@@ -319,7 +320,7 @@ async function main() {
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "보성군청 관광체험 포털", url: "http://dahyang.boseong.go.kr", type: "LOCAL_GOV" }
+          { name: "보성군청 관광체험 포털", url: "https://teafestival.clickn.co.kr", type: "LOCAL_GOV" }
         ]
       },
       programs: {
@@ -479,10 +480,10 @@ async function main() {
       description: "대한민국 최대의 벚꽃 축제이자 해군 모항의 낭만이 어우러진 봄의 향연! 36만 그루의 왕벚나무가 일제히 만개하여 터널을 이루는 여좌천 로망스다리와, 웅장한 군악의장 페스티벌이 전 세계 관광객을 맞이합니다.",
       region: "경남 창원시",
       address: "진해 중원로터리 및 여좌천 일원 (경상남도 창원시 진해구 통신동 1)",
-      startDate: new Date("2026-03-25T09:00:00+09:00"),
-      endDate: new Date("2026-04-03T22:00:00+09:00"),
+      startDate: new Date("2026-03-27T09:00:00+09:00"),
+      endDate: new Date("2026-04-05T22:00:00+09:00"),
       category: "NATURE",
-      officialUrl: "http://culture.changwon.go.kr",
+      officialUrl: "https://jgfestival.or.kr",
       imageUrl: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=800&auto=format&fit=crop",
       hasParking: true,
       hasShuttle: true,
@@ -494,7 +495,7 @@ async function main() {
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "창원시 관광과 축제 기획부 공지", url: "http://culture.changwon.go.kr", type: "LOCAL_GOV" }
+          { name: "진해군항제 공식 홈페이지", url: "https://jgfestival.or.kr", type: "LOCAL_GOV" }
         ]
       },
       programs: {
@@ -587,7 +588,7 @@ async function main() {
       startDate: new Date("2026-05-16T10:00:00+09:00"),
       endDate: new Date("2026-05-24T18:00:00+09:00"),
       category: "ART",
-      officialUrl: "http://www.yeojuceramic.or.kr",
+      officialUrl: "https://www.yjfestival.or.kr",
       imageUrl: "https://images.unsplash.com/photo-1576016770956-debb63d900ad?w=800&auto=format&fit=crop",
       hasParking: true,
       hasShuttle: true,
@@ -599,7 +600,7 @@ async function main() {
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "여주세종문화관광재단 홍보팀", url: "http://www.yeojuceramic.or.kr", type: "LOCAL_GOV" }
+          { name: "여주세종문화관광재단 홍보팀", url: "https://www.yjfestival.or.kr", type: "LOCAL_GOV" }
         ]
       },
       programs: {
@@ -622,7 +623,7 @@ async function main() {
       startDate: new Date("2026-09-18T11:00:00+09:00"),
       endDate: new Date("2026-09-20T21:30:00+09:00"),
       category: "MUSIC",
-      officialUrl: "http://www.bpf.or.kr",
+      officialUrl: "https://www.icbp.go.kr/open_content/festival/",
       imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop",
       hasParking: false,
       hasShuttle: false,
@@ -634,7 +635,7 @@ async function main() {
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "부평구축제위원회 및 부평문화원 공식 가이드", url: "http://www.bpf.or.kr", type: "LOCAL_GOV" }
+          { name: "부평구 축제 공식 페이지", url: "https://www.icbp.go.kr/open_content/festival/", type: "LOCAL_GOV" }
         ]
       },
       programs: {
@@ -751,42 +752,43 @@ async function main() {
     }
   });
 
-  // 10. 춘천 레고랜드 어린이 야간개장 페스티벌 (진행했음 - 2026년 5월 3일 ~ 5월 5일)
+  // 22. 2026 임실N장미축제 (예정 - 2026년 5월 28일 ~ 5월 31일)
   await prisma.festival.create({
     data: {
-      name: "춘천 레고랜드 어린이 야간개장 페스티벌",
-      description: "어린이날 골든위크를 맞아 펼쳐지는 가족 친화형 빛과 블록의 환상 축제! 오후 9시까지 이어지는 야간 연장 운영과 함께 오색빛 조명으로 빛나는 레고 빌리지 전체의 라이트쇼, 대형 미니 드론 불꽃쇼가 하늘을 가득 메웁니다.",
-      region: "강원 춘천시",
-      address: "레고랜드 코리아 리조트 일대 (강원특별자치도 춘천시 하중도길 128)",
-      startDate: new Date("2026-05-03T10:00:00+09:00"),
-      endDate: new Date("2026-05-05T21:00:00+09:00"),
-      category: "ART",
-      officialUrl: "https://www.legoland.kr",
-      imageUrl: "https://images.unsplash.com/photo-1564981797816-1043d01117da?w=800&auto=format&fit=crop",
+      name: "2026 임실N장미축제",
+      description: "전북 임실에서 처음으로 개최되는 장미 축제! 약 6만 5천㎡ 규모의 장미원에서 150여 종, 2만 2천여 주의 장미가 화려하게 피어나는 가운데 개막 축하공연, 로즈 음악회, 보이는 라디오, 프로포즈 게임, 어린이 체험 프로그램, 그리고 풍성한 임실 치즈 먹거리를 즐길 수 있습니다.",
+      region: "전북 임실군",
+      address: "임실치즈테마파크 일원 (전북특별자치도 임실군 성수면 도인2길 50)",
+      startDate: new Date("2026-05-28T09:00:00+09:00"),
+      endDate: new Date("2026-05-31T18:00:00+09:00"),
+      category: "NATURE",
+      officialUrl: "https://imsilasfestival.co.kr",
+      imageUrl: "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=800&auto=format&fit=crop",
       hasParking: true,
-      hasShuttle: true,
-      isPetFriendly: false,
+      hasShuttle: false,
+      isPetFriendly: true,
       isChildFriendly: true,
-      congestionStatus: "HIGH",
-      trustScore: 92,
-      views: 421,
+      congestionStatus: "NORMAL",
+      trustScore: 95,
+      views: 0,
       status: "VERIFIED",
       sources: {
         create: [
-          { name: "레고랜드 코리아 리조트 공식 운영캘린더", url: "https://www.legoland.kr", type: "LOCAL_GOV" }
+          { name: "임실 장미축제&산타축제 공식 홈페이지", url: "https://imsilasfestival.co.kr", type: "LOCAL_GOV" },
+          { name: "한국관광공사 대한민국 구석구석", url: "https://korean.visitkorea.or.kr/main/fes_main.do", type: "VISIT_KOREA" }
         ]
       },
       programs: {
         create: [
-          { name: "레고 빌리지 3D 미디어 라이트 파사드 쇼", time: "20:00 - 20:30", content: "초대형 레고 시계탑에 쏘아 올리는 인터랙티브 3D 맵핑 화려한 레이저쇼" },
-          { name: "밤하늘 드론 불꽃놀이 피날레 (레고 시티 페스타)", time: "20:45 - 21:00", content: "300대의 레고 테마 드론이 연출하는 불꽃과 야간 드론 불꽃 스토리 쇼" },
-          { name: "어린이날 특별 레고 캐릭터 특별 퍼레이드", time: "14:00 / 16:30", content: "레고 랜드 시그니처 프렌즈 피규어 인형들이 총출동하는 야외 댄스 퍼레이드" }
+          { name: "개막 축하공연 & 로즈 음악회", time: "5/28 18:00 - 21:00", content: "화려한 장미원을 배경으로 펼쳐지는 특별 초청 가수 축하 공연과 감성 로즈 음악회" },
+          { name: "장미원 산책 & 포토존 체험", time: "09:00 - 18:00 (상시)", content: "150여 종 2만 2천여 주의 장미가 피어난 6만 5천㎡ 대규모 장미원 힐링 산책 및 인생샷 포토존" },
+          { name: "임실치즈 먹거리 장터 & 프로포즈 이벤트", time: "상시 운영", content: "임실 특산 치즈를 활용한 다양한 먹거리와 장미원에서 즐기는 로맨틱 프로포즈 게임" }
         ]
       }
     }
   });
 
-  // 11. 미검수 제보 데이터 2건 (UserSubmission)
+  // 미검수 제보 데이터 2건 (UserSubmission)
   await prisma.userSubmission.create({
     data: {
       name: "완도 전복 웰빙 시식 축제",
@@ -817,6 +819,8 @@ async function main() {
     }
   });
 
+  await seedMassFestivals(prisma);
+
   await repairSeededFestivalData();
 
   console.log("✅ 실물 데이터 시딩 완료!");
@@ -828,7 +832,8 @@ async function repairSeededFestivalData() {
   });
 
   for (const festival of festivals) {
-    const imageUrl = pickFestivalImage(festival.name, festival.imageUrl) || (isLikelyStockImage(festival.imageUrl) ? null : festival.imageUrl);
+    // pickFestivalImage는 이제 로컬 폴백이 있으면 교체, 없으면 원본(Unsplash 포함) 유지
+    const imageUrl = pickFestivalImage(festival.name, festival.imageUrl) || festival.imageUrl;
 
     await prisma.festival.update({
       where: { id: festival.id },

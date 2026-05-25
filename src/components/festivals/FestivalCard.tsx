@@ -15,6 +15,7 @@ import {
   PawPrint
 } from "lucide-react";
 import { FestivalStatusBadge } from "./FestivalStatusBadge";
+import { CATEGORY_FALLBACK_IMAGES } from "@/lib/collectors/quality";
 
 export interface FestivalCardProps {
   festival: {
@@ -61,7 +62,7 @@ export function FestivalCard({ festival }: FestivalCardProps) {
   };
 
   const scoreColor = getTrustScoreColor(festival.trustScore);
-  const imageToShow = festival.imageUrl || "/images/gokseong_roses.png";
+  const imageToShow = festival.imageUrl || CATEGORY_FALLBACK_IMAGES[festival.category] || CATEGORY_FALLBACK_IMAGES.OTHER;
   const formattedCategory = categoryLabels[festival.category] || festival.category;
 
   return (
@@ -78,8 +79,8 @@ export function FestivalCard({ festival }: FestivalCardProps) {
         />
 
         {festival.trustScore >= 80 && (
-          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-bold text-accent shadow-sm">
-            <CheckCircle2 size={12} className="shrink-0" />
+          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-card/95 px-2.5 py-1 text-xs font-bold text-accent shadow-sm">
+            <CheckCircle2 size={14} className="shrink-0" />
             <span>검증됨</span>
           </div>
         )}
@@ -91,20 +92,20 @@ export function FestivalCard({ festival }: FestivalCardProps) {
 
       <div className="flex flex-1 flex-col p-4">
         <div className="flex-1">
-          <div className="mb-2 flex items-center gap-2 text-xs font-bold text-muted-foreground">
-            <MapPin size={13} className="shrink-0 text-primary/80" />
+          <div className="mb-2 flex items-center gap-2 text-sm font-bold text-muted-foreground">
+            <MapPin size={15} className="shrink-0 text-primary/80" />
             <span>{festival.region}</span>
             <span className="h-1 w-1 rounded-full bg-border" />
             <span className="text-primary">{formattedCategory}</span>
           </div>
 
           <Link href={`/festivals/${festival.id}`} className="block">
-            <h2 className="mb-2 line-clamp-2 text-lg font-extrabold leading-snug text-foreground transition-colors group-hover:text-primary">
+            <h2 className="mb-2 line-clamp-2 text-xl font-extrabold leading-snug text-foreground transition-colors group-hover:text-primary">
               {festival.name}
             </h2>
           </Link>
 
-          <p className="mb-4 line-clamp-3 text-sm leading-6 text-muted-foreground">
+          <p className="mb-4 line-clamp-3 text-sm leading-7 text-muted-foreground">
             {festival.description || "축제 소개가 아직 보강 중입니다. 공식 출처가 확인되는 대로 업데이트됩니다."}
           </p>
         </div>
@@ -117,34 +118,34 @@ export function FestivalCard({ festival }: FestivalCardProps) {
         </div>
 
         <div className="mb-4 space-y-2">
-          <div className="flex items-center justify-between text-[11px] font-bold">
+          <div className="flex items-center justify-between text-sm font-bold">
             <span className="flex items-center gap-1 text-muted-foreground">
               <span>출처 신뢰도</span>
               <span title="지자체 출처, 공식 사이트 유무, 편의정보 유무 등으로 자동 계산되는 신뢰 수준입니다.">
-                <Info size={11} className="cursor-help text-muted-foreground/60" />
+                <Info size={14} className="cursor-help text-muted-foreground/60" />
               </span>
             </span>
             <span className={`font-bold ${scoreColor.split(" ")[1]}`}>{festival.trustScore}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
             <div className={`h-full rounded-full transition-all duration-500 ${scoreColor.split(" ")[0]}`} style={{ width: `${festival.trustScore}%` }} />
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-border pt-3 text-xs font-bold text-muted-foreground">
+        <div className="flex items-center justify-between gap-3 border-t border-border pt-3 text-sm font-bold text-muted-foreground">
           <span className="flex min-w-0 items-center gap-1">
-            <Calendar size={13} className="shrink-0" />
+            <Calendar size={15} className="shrink-0" />
             <span>{formatDate(festival.startDate)} - {formatDate(festival.endDate)}</span>
           </span>
           <span className="flex shrink-0 items-center gap-1">
-            <Eye size={13} className="shrink-0" />
+            <Eye size={15} className="shrink-0" />
             <span>{festival.views}</span>
           </span>
         </div>
 
         <div className="grid grid-cols-[1fr_auto] gap-2 pt-4">
           <Link href={`/festivals/${festival.id}`} className="block">
-            <button className="h-10 w-full cursor-pointer rounded-md text-sm font-bold press-button">
+            <button className="h-12 w-full cursor-pointer rounded-md text-base font-bold press-button">
               자세히 보기
             </button>
           </Link>
@@ -153,10 +154,10 @@ export function FestivalCard({ festival }: FestivalCardProps) {
               href={festival.officialUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-primary hover:text-primary"
+              className="flex h-12 w-12 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-primary hover:text-primary"
               title="공식 사이트 열기"
             >
-              <ExternalLink size={16} />
+              <ExternalLink size={18} />
             </a>
           )}
         </div>
@@ -175,8 +176,8 @@ function FeaturePill({
   title: string;
 }) {
   return (
-    <div className="flex items-center gap-1 rounded-full bg-secondary px-2 py-1 text-[11px] font-bold" title={title}>
-      <Icon size={12} className="shrink-0 text-primary" />
+    <div className="flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1.5 text-xs font-bold" title={title}>
+      <Icon size={14} className="shrink-0 text-primary" />
       <span>{label}</span>
     </div>
   );

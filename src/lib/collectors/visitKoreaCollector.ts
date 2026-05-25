@@ -300,7 +300,7 @@ export class VisitKoreaCollector implements FestivalCollector {
         isPetFriendly: false,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=bof_2026"
+        sourceUrl: "https://korean.visitkorea.or.kr/main/fes_main.do"
       },
       {
         name: "서울 월드 디제이 페스티벌 2026",
@@ -317,15 +317,15 @@ export class VisitKoreaCollector implements FestivalCollector {
         isPetFriendly: false,
         isChildFriendly: false,
         sourceName: this.sourceName,
-        sourceUrl: "https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=wdjfest_2026"
+        sourceUrl: "https://korean.visitkorea.or.kr/main/fes_main.do"
       },
       {
         name: "제29회 보령 머드축제",
         description: "전 세계인이 함께 즐기는 대한민국 대표 여름 축제! 대천해수욕장의 고품질 머드를 활용한 머드 슬라이드, 대형 머드탕, 머드 몹신, 머드 셀프 마사지 등 짜릿한 해변 액티비티가 무더위를 날려 버립니다.",
         region: "충남 보령시",
         address: "대천해수욕장 머드광장 일원 (충청남도 보령시 신흑동 2282)",
-        startDate: new Date("2026-07-17T10:00:00+09:00"),
-        endDate: new Date("2026-07-26T18:00:00+09:00"),
+        startDate: new Date("2026-07-24T10:00:00+09:00"),
+        endDate: new Date("2026-08-09T18:00:00+09:00"),
         category: "CULTURE",
         officialUrl: "https://www.mudfestival.or.kr",
         imageUrl: "https://images.unsplash.com/photo-1548678957-f831e21b223c?w=800&auto=format&fit=crop",
@@ -334,7 +334,7 @@ export class VisitKoreaCollector implements FestivalCollector {
         isPetFriendly: false,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=mud_2026"
+        sourceUrl: "https://korean.visitkorea.or.kr/main/fes_main.do"
       },
       {
         name: "제28회 함평 나비대축제",
@@ -344,14 +344,14 @@ export class VisitKoreaCollector implements FestivalCollector {
         startDate: new Date("2026-04-28T09:00:00+09:00"),
         endDate: new Date("2026-05-07T18:00:00+09:00"),
         category: "NATURE",
-        officialUrl: "https://www.hampyeong.go.kr/expo",
+        officialUrl: "https://www.hpftf.or.kr",
         imageUrl: "https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: true,
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=butterfly_2026"
+        sourceUrl: "https://korean.visitkorea.or.kr/main/fes_main.do"
       },
       {
         name: "제40회 이천 도자기축제",
@@ -361,14 +361,14 @@ export class VisitKoreaCollector implements FestivalCollector {
         startDate: new Date("2026-04-24T10:00:00+09:00"),
         endDate: new Date("2026-05-03T18:00:00+09:00"),
         category: "ART",
-        officialUrl: "https://www.icheon.go.kr/ceramic",
+        officialUrl: "https://www.ceramic.or.kr",
         imageUrl: "https://images.unsplash.com/photo-1576016770956-debb63d900ad?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: true,
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://korean.visitkorea.or.kr/detail/fes_detail.do?cotid=ceramic_2026"
+        sourceUrl: "https://korean.visitkorea.or.kr/main/fes_main.do"
       }
     ];
 

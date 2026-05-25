@@ -118,7 +118,14 @@ export async function syncFestivals(): Promise<SyncReport> {
       
       // 누락된 필드 보완 (데이터 풍부화)
       const updatedDescription = matched.description || scraped.description || null;
-      const updatedImageUrl = (!matched.imageUrl || isLikelyStockImage(matched.imageUrl)) ? (scraped.imageUrl || matched.imageUrl || null) : matched.imageUrl;
+      const updatedImageUrl = (() => {
+        // 새 수집 이미지가 비스톡 공식 이미지면 우선 채택
+        if (scraped.imageUrl && !isLikelyStockImage(scraped.imageUrl)) return scraped.imageUrl;
+        // 기존 이미지가 있으면 유지 (스톡이라도)
+        if (matched.imageUrl) return matched.imageUrl;
+        // 둘 다 없으면 새 이미지라도 사용
+        return scraped.imageUrl || null;
+      })();
       const updatedOfficialUrl = isUsableUrl(matched.officialUrl) ? matched.officialUrl : (scraped.officialUrl || null);
       
       const updatedParking = matched.hasParking || scraped.hasParking;

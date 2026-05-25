@@ -47,11 +47,19 @@ export function isLikelyStockImage(url?: string | null): boolean {
 }
 
 export function pickFestivalImage(name: string, imageUrl?: string | null): string | undefined {
+  // 실제 공식 이미지(비-스톡)가 있으면 우선 사용
   if (imageUrl && !isLikelyStockImage(imageUrl)) {
     return imageUrl;
   }
 
-  return FESTIVAL_IMAGE_FALLBACKS.find((item) => item.pattern.test(name))?.imageUrl;
+  // 로컬 폴백 매핑이 있으면 교체
+  const localFallback = FESTIVAL_IMAGE_FALLBACKS.find((item) => item.pattern.test(name))?.imageUrl;
+  if (localFallback) {
+    return localFallback;
+  }
+
+  // 로컬 폴백이 없으면 기존 이미지(Unsplash 포함)를 유지
+  return imageUrl || undefined;
 }
 
 export function normalizeOfficialUrl(url?: string | null): string | undefined {
@@ -64,6 +72,16 @@ export function normalizeSourceUrl(sourceUrl: string | undefined, officialUrl?: 
   if (isUsableUrl(officialUrl)) return officialUrl;
   return "https://korean.visitkorea.or.kr/main/fes_main.do";
 }
+
+/** 카테고리별 기본 폴백 이미지 (이미지가 전혀 없는 축제용) */
+export const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  FOOD: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop",
+  NATURE: "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=800&auto=format&fit=crop",
+  CULTURE: "https://images.unsplash.com/photo-1533669955142-6a73332af4db?w=800&auto=format&fit=crop",
+  ART: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop",
+  MUSIC: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop",
+  OTHER: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&auto=format&fit=crop"
+};
 
 export function normalizeCollectedFestival(item: CollectedFestival): CollectedFestival {
   const officialUrl = normalizeOfficialUrl(item.officialUrl);

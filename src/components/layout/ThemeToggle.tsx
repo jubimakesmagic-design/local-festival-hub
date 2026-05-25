@@ -38,20 +38,20 @@ export function ThemeToggle() {
 
   // SSR Hydration 에러 방지용 플레이스홀더
   if (!mounted) {
-    return <div className="w-9 h-9 border border-dashed border-border rounded" />;
+    return <div className="w-11 h-11 border border-dashed border-border rounded-xl animate-pulse" />;
   }
 
   return (
     <button
       onClick={toggleTheme}
-      className="h-9 w-9 rounded border border-dashed border-border/80 bg-card hover:bg-secondary/40 text-foreground flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm"
+      className="h-11 w-11 rounded-xl border border-dashed border-border/80 bg-card hover:bg-secondary/40 text-foreground flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm"
       title={theme === "light" ? "밤 축제 모드로 변경 (다크)" : "낮 축제 모드로 변경 (라이트)"}
     >
       <div className="relative w-5 h-5 flex items-center justify-center transition-transform duration-500 group-hover:rotate-45">
         {theme === "light" ? (
-          <Moon size={16} className="text-primary shrink-0 transition-all duration-300" />
+          <Moon size={18} className="text-primary shrink-0 transition-all duration-300" />
         ) : (
-          <Sun size={16} className="text-accent shrink-0 transition-all duration-300" />
+          <Sun size={18} className="text-accent shrink-0 transition-all duration-300" />
         )}
       </div>
     </button>

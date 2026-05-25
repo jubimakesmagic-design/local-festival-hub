@@ -232,7 +232,7 @@ ${items.join("\n\n")}
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://www.pocheon.go.kr/multi/public/notify/view?id=20260520"
+        sourceUrl: "https://www.pocheon.go.kr/tour"
       },
       {
         name: "차 없는 잠수교 뚜벅뚜벅 축제",
@@ -249,7 +249,7 @@ ${items.join("\n\n")}
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://hangang.seoul.go.kr/news/notify/view?id=20260510"
+        sourceUrl: "https://hangang.seoul.go.kr"
       },
       {
         name: "제27회 하동 야생차문화축제",
@@ -259,14 +259,14 @@ ${items.join("\n\n")}
         startDate: new Date("2026-05-01T09:00:00+09:00"),
         endDate: new Date("2026-05-05T18:00:00+09:00"),
         category: "CULTURE",
-        officialUrl: "http://www.hadong.go.kr/tea",
+        officialUrl: "https://www.hadong.go.kr",
         imageUrl: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: true,
         isPetFriendly: false,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://www.hadong.go.kr/multi/public/notify/view?id=20260501"
+        sourceUrl: "https://www.hadong.go.kr"
       },
       {
         name: "제33회 연천 구석기축제",
@@ -276,14 +276,14 @@ ${items.join("\n\n")}
         startDate: new Date("2026-05-02T10:00:00+09:00"),
         endDate: new Date("2026-05-05T21:00:00+09:00"),
         category: "CULTURE",
-        officialUrl: "https://www.yeoncheon.go.kr/gooseokgi",
+        officialUrl: "https://www.yeoncheon.go.kr/festival",
         imageUrl: "https://images.unsplash.com/photo-1564981797816-1043d01117da?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: true,
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://www.yeoncheon.go.kr/multi/public/notify/view?id=20260502"
+        sourceUrl: "https://www.yeoncheon.go.kr/festival"
       },
       {
         name: "제23회 홍성 남당항 새조개축제",
@@ -293,14 +293,14 @@ ${items.join("\n\n")}
         startDate: new Date("2026-01-23T09:00:00+09:00"),
         endDate: new Date("2026-03-31T22:00:00+09:00"),
         category: "FOOD",
-        officialUrl: "https://www.hongseong.go.kr/tour",
+        officialUrl: "https://www.hongseong.go.kr/tour.do",
         imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: false,
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://www.hongseong.go.kr/multi/public/notify/view?id=20260123"
+        sourceUrl: "https://www.hongseong.go.kr/tour.do"
       },
       {
         name: "제22회 영양 산나물축제",
@@ -310,14 +310,14 @@ ${items.join("\n\n")}
         startDate: new Date("2026-05-07T10:00:00+09:00"),
         endDate: new Date("2026-05-10T18:00:00+09:00"),
         category: "FOOD",
-        officialUrl: "http://www.yyg.go.kr/tour",
+        officialUrl: "https://www.yftf.kr",
         imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&auto=format&fit=crop",
         hasParking: true,
         hasShuttle: false,
         isPetFriendly: true,
         isChildFriendly: true,
         sourceName: this.sourceName,
-        sourceUrl: "https://www.yyg.go.kr/multi/public/notify/view?id=20260507"
+        sourceUrl: "https://www.yftf.kr"
       }
     ];
 

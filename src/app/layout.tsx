@@ -19,6 +19,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -38,9 +39,10 @@ export default function RootLayout({
         <main className="flex-1 relative">
           {children}
         </main>
-        <footer className="border-t border-border/40 py-6 text-center text-xs text-muted-foreground bg-background">
-          <div className="container mx-auto px-4">
-            &copy; {new Date().getFullYear()} 동네축제 (local-festival-hub). All rights reserved.
+        <footer className="border-t border-border/40 py-8 text-center text-sm text-muted-foreground bg-background">
+          <div className="container mx-auto px-4 space-y-1">
+            <p className="font-semibold">&copy; {new Date().getFullYear()} 동네축제</p>
+            <p className="text-xs">우리 동네 축제를 한눈에 찾아보세요</p>
           </div>
         </footer>
       </body>
