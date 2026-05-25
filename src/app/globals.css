@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Nanum+Myeongjo:wght@400;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* 라이트 모드 (Day Festival): 따뜻한 햇살과 활기찬 마을 축제 느낌 */
+  --background: 43 100% 98.8%; /* #FFFDF8 아주 화사하고 포근한 햇살빛 웜 화이트 */
+  --foreground: 30 18% 12%; /* #251F19 가독성이 높고 따뜻한 에스프레소 블랙 */
+  
+  --card: 0 0% 100%; /* #FFFFFF 깨끗하고 밝은 화이트 페이퍼 */
+  --card-foreground: 30 18% 12%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 30 18% 12%;
+  
+  --primary: 16 100% 55%; /* #FF5722 활기찬 페스티벌 코랄 오렌지 */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 47 100% 94%; /* #FFF8D4 따뜻한 햇빛을 닮은 솔라 골드 */
+  --secondary-foreground: 30 18% 12%;
+  
+  --muted: 40 40% 95.5%; /* #FAF4E8 부드러운 오트밀 베이지 */
+  --muted-foreground: 30 10% 48%; /* 포근한 코코아 브라운 */
+  
+  --accent: 155 75% 38%; /* #10B981 싱그러운 축제 잔디빛 초록 */
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 350 85% 55%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 40 30% 89%; /* #F2E6D2 차분한 샌드 베이지 보더 */
+  --input: 40 30% 89%;
+  --ring: 16 100% 55%;
+  
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* 다크 모드 (Night Festival): 밤하늘 아래 오색 풍등과 낭만적인 전등이 수놓인 밤 축제 느낌 */
+  --background: 240 40% 7.8%; /* #0A0A1C 낭만적인 밤하늘 사파이어 딥 나이트 */
+  --foreground: 40 100% 98%; /* #FFFDF5 은은하고 포근한 미색 웜 아이보리 */
+  
+  --card: 240 35% 12.5%; /* #13132B 아늑한 밤축제 딥 인디고 퍼플 */
+  --card-foreground: 40 100% 98%;
+  
+  --popover: 240 35% 12%;
+  --popover-foreground: 40 100% 98%;
+  
+  --primary: 18 100% 63%; /* #FF7043 어두운 밤을 따뜻하게 밝히는 모닥불 오렌지 */
+  --primary-foreground: 240 40% 6%;
+  
+  --secondary: 240 25% 17.5%; /* #21213A 세련된 야간 네이비 */
+  --secondary-foreground: 40 100% 98%;
+  
+  --muted: 240 20% 15.5%;
+  --muted-foreground: 240 10% 68%;
+  
+  --accent: 45 100% 58%; /* #FFCA28 밤하늘에 띄우는 소원 풍등 골드 */
+  --accent-foreground: 240 40% 6%;
+  
+  --destructive: 350 80% 58%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 240 20% 19%;
+  --input: 240 20% 19%;
+  --ring: 18 100% 63%;
+}
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 0.2rem);
+  --radius-sm: calc(var(--radius) - 0.4rem);
+
+  /* 타이포그래피 확장 */
+  --font-sans: "Outfit", "Geist", sans-serif;
+  --font-serif: "Lora", "Nanum Myeongjo", "Playfair Display", Georgia, serif;
+  --font-typewriter: "Courier Prime", "Courier", monospace;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* 은은하게 흩날리는 컬러풀 축제 콘페티 패턴 */
+  background-image: 
+    radial-gradient(hsl(var(--primary) / 0.045) 1.2px, transparent 1.2px),
+    radial-gradient(hsl(var(--accent) / 0.035) 1.2px, transparent 1.2px);
+  background-size: 36px 36px;
+  background-position: 0 0, 18px 18px;
+}
+
+.dark body {
+  background-image: 
+    radial-gradient(hsl(var(--primary) / 0.065) 1.2px, transparent 1.2px),
+    radial-gradient(hsl(var(--accent) / 0.045) 1.2px, transparent 1.2px);
+}
+
+/* 1. 폴라로이드 패널 클래스 - 프리미엄 크리스프 섀도우 */
+.polaroid-panel {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 80%);
+  padding: 14px 14px 28px 14px;
+  box-shadow: 
+    0 4px 20px -2px rgba(255, 87, 34, 0.03),
+    0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+.polaroid-panel:hover {
+  transform: translateY(-6px) scale(1.008) rotate(0.5deg);
+  box-shadow: 
+    0 14px 32px -4px rgba(255, 87, 34, 0.09),
+    0 6px 16px -2px rgba(0, 0, 0, 0.03);
+  border-color: hsl(var(--primary) / 35%);
+}
+
+/* 2. 마스킹 테이프 데코 효과 - 밝고 축제다운 느낌 */
+.masking-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  width: 84px;
+  height: 22px;
+  background-color: rgba(255, 202, 40, 0.65); /* 투명 풍등 옐로우 */
+  border-left: 1px dashed rgba(255, 255, 255, 0.4);
+  border-right: 1px dashed rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  pointer-events: none;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.polaroid-panel:hover .masking-tape {
+  transform: translateX(-50%) rotate(-0.5deg) scale(1.05);
+  background-color: rgba(255, 202, 40, 0.8);
+}
+
+/* 스트라이프 패턴 마스킹 테이프 변형 */
+.masking-tape-stripe {
+  background-color: rgba(255, 112, 67, 0.5); /* 활기찬 코랄 */
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.25) 4px, rgba(255, 255, 255, 0.25) 8px);
+}
+
+.polaroid-panel:hover .masking-tape-stripe {
+  background-color: rgba(255, 112, 67, 0.65);
+}
+
+/* 3. 빈티지 우표 소인 배지 스타일 */
+.stamp-badge {
+  border: 1px dashed hsl(var(--primary));
+  background-color: hsl(var(--secondary) / 40%);
+  color: hsl(var(--primary));
+  font-family: var(--font-sans);
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 3px 8px;
+  box-shadow: 0 2px 8px rgba(255, 87, 34, 0.04);
+  transition: all 0.3s ease;
+}
+
+.stamp-badge:hover {
+  background-color: hsl(var(--secondary) / 70%);
+  transform: scale(1.03);
+}
+
+/* 4. 프리미엄 버튼 인터랙션 */
+.press-button {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  box-shadow: 0 4px 14px -2px rgba(255, 87, 34, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.press-button:hover {
+  background-color: hsl(var(--primary) / 92%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -1px rgba(255, 87, 34, 0.35);
+}
+
+.press-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(255, 87, 34, 0.2);
+}
+
+/* 5. 타자기 글자 효과 */
+.font-typewriter {
+  font-family: var(--font-typewriter) !important;
+}
+
+/* 6. 다이어리 책갈피/인쇄 이중 구분선 */
+.diary-divider {
+  border: none;
+  border-top: 1px solid hsl(var(--border) / 80%);
+  border-bottom: 1px solid hsl(var(--border) / 80%);
+  height: 3px;
+  margin: 1.5rem 0;
+}
+
+/* 애니메이션 및 모션 효과 */
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 15s linear infinite;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background-color: hsl(var(--card) / 75%);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 50%);
+}
+
+.dark .glass-panel {
+  background-color: hsl(var(--card) / 65%);
+}

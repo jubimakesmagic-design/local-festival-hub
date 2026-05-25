@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Festival {
+  id               Int               @id @default(autoincrement())
+  name             String
+  description      String?
+  region           String            // 예: "전남 나주시", "경기 가평군"
+  address          String?           // 예: "영산강 둔치체육공원 일원"
+  startDate        DateTime
+  endDate          DateTime
+  category         String            // 예: "FOOD", "CULTURE", "ART", "MUSIC", "NATURE", "OTHER"
+  officialUrl      String?
+  imageUrl         String?
+  hasParking       Boolean           @default(false)
+  hasShuttle       Boolean           @default(false)
+  isPetFriendly    Boolean           @default(false)
+  isChildFriendly  Boolean           @default(false)
+  congestionStatus String            @default("NORMAL") // LOW, NORMAL, HIGH
+  trustScore       Int               @default(50)
+  views            Int               @default(0)
+  status           String            @default("NEEDS_REVIEW") // NEEDS_REVIEW, VERIFIED, REJECTED
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  sources          FestivalSource[]
+  programs         FestivalProgram[]
+}
+
+model FestivalSource {
+  id         Int      @id @default(autoincrement())
+  festivalId Int
+  festival   Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  name       String   // 예: "나주시 공식 블로그", "무등일보 사용자 제보"
+  url        String
+  type       String   // LOCAL_GOV, NEWS, USER_SUBMIT, VISIT_KOREA
+}
+
+model FestivalProgram {
+  id         Int      @id @default(autoincrement())
+  festivalId Int
+  festival   Festival @relation(fields: [festivalId], references: [id], onDelete: Cascade)
+  name       String
+  time       String?
+  content    String?
+}
+
+model UserSubmission {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  region           String   // 예: "전남 나주시"
+  address          String?  // 예: "영산강 둔치체육공원 일원"
+  dateRange        String   // 예: "2026-10-12 ~ 2026-10-14"
+  category         String   // FOOD, CULTURE, ART, MUSIC, NATURE, OTHER
+  sourceUrl        String?
+  submitterEmail   String?
+  submitterContact String?
+  status           String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt        DateTime @default(now())
+}
