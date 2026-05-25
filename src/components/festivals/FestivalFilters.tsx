@@ -199,7 +199,7 @@ export function FestivalFilters() {
             return (
               <label
                 key={opt.key}
-                className="flex min-h-13 items-center space-x-3 rounded-lg border border-border bg-background px-3.5 py-3 text-base font-extrabold transition-colors hover:bg-secondary/40 cursor-pointer"
+                className="flex min-h-14 items-center space-x-3 rounded-lg border border-border bg-background px-3.5 py-3 text-base font-extrabold transition-colors hover:bg-secondary/40 cursor-pointer"
               >
                 <input
                   type="checkbox"

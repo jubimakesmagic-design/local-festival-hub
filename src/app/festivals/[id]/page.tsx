@@ -160,7 +160,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
         <div className="absolute top-6 left-4 md:left-8 z-20">
           <Link 
             href="/"
-            className="flex items-center space-x-2 px-4 py-2 bg-card text-foreground border border-border/60 text-sm font-bold hover:scale-102 hover:bg-secondary transition-all shadow-[2px_2px_8px_rgba(0,0,0,0.05)] rounded-lg"
+            className="flex min-h-12 items-center space-x-2 rounded-lg border border-border/60 bg-card px-4 py-2 text-base font-extrabold text-foreground shadow-[2px_2px_8px_rgba(0,0,0,0.05)] transition-all hover:scale-[1.02] hover:bg-secondary"
           >
             <ArrowLeft size={16} className="text-primary shrink-0" />
             <span>둘러보기로 돌아가기</span>
@@ -175,7 +175,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
             </Badge>
             <FestivalStatusBadge startDate={festival.startDate} endDate={festival.endDate} />
           </div>
-          <h1 className="text-2xl md:text-4xl lg:text-4.5xl font-black text-white leading-tight tracking-tight drop-shadow-lg font-serif">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-lg font-serif">
             {festival.name}
           </h1>
           <p className="text-white/95 text-sm md:text-base max-w-2xl font-medium drop-shadow-md leading-relaxed font-serif line-clamp-1">
