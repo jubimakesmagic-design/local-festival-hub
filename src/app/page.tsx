@@ -200,15 +200,21 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        <section className="mb-5 rounded-lg border border-border bg-card p-3 shadow-sm md:mb-6 md:p-5">
+        <section className="mb-5 rounded-lg border border-border bg-card p-4 shadow-sm md:mb-6 md:p-5">
+          <div className="mb-4 space-y-1 md:hidden">
+            <h1 className="text-2xl font-extrabold leading-tight text-foreground">축제 찾기</h1>
+            <p className="text-base font-bold leading-7 text-muted-foreground">
+              날짜와 지역을 넣고 갈 만한 축제를 찾아보세요.
+            </p>
+          </div>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
             <div className="w-full md:flex-1">
               <Suspense fallback={<div className="h-10 bg-muted/20 animate-pulse rounded-lg" />}>
                 <FestivalSearch />
               </Suspense>
             </div>
-            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between md:w-auto md:justify-end md:gap-4 shrink-0">
-              <span className="text-sm font-bold text-muted-foreground md:text-base shrink-0">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:w-auto md:justify-end md:gap-4 shrink-0">
+              <span className="text-base font-extrabold text-foreground md:text-base shrink-0">
                 총 {totalCount}개의 축제 표시
               </span>
               <Suspense fallback={<div className="h-10 w-48 bg-muted/20 animate-pulse rounded-lg" />}>

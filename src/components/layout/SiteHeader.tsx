@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, MapPin, PlusCircle, ShieldAlert } from "lucide-react";
+import { Compass, MapPin, ShieldAlert } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
@@ -57,4 +57,3 @@ export function SiteHeader() {
     </header>
   );
 }
-

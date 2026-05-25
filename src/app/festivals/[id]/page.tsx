@@ -20,14 +20,7 @@ import {
   ShieldCheck, 
   Clock, 
   Info,
-  ExternalLink,
-  Utensils, 
-  Trees, 
-  Compass, 
-  Palette, 
-  Music as MusicIcon, 
-  Sparkles, 
-  ImageOff
+  ExternalLink
 } from "lucide-react";
 import { isLikelyStockImage } from "@/lib/collectors/quality";
 
@@ -68,7 +61,7 @@ export default async function FestivalDetailPage({ params }: PageProps) {
         data: { views: { increment: 1 } }
       });
       festival.views += 1; // 화면 표시용으로 조회수 1 증가
-    } catch (writeError) {
+    } catch {
       console.warn("[DetailPage] 서버리스 읽기 전용 환경으로 인해 조회수 증가가 스킵되었습니다 (정상 동작).");
     }
   } catch (e) {

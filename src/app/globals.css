@@ -282,14 +282,29 @@ body {
 
   /* 모든 인터랙티브 요소 최소 터치 타겟 보장 */
   button, a, [role="button"], label[for], input[type="checkbox"], input[type="radio"] {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 48px;
+    min-width: 48px;
   }
 
   /* 카드 내부 작은 아이콘 버튼은 적절히 유지 */
   .h-1, .w-1 {
     min-height: auto;
     min-width: auto;
+  }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid hsl(var(--ring) / 70%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .press-button:hover {
+    transform: none;
   }
 }
 

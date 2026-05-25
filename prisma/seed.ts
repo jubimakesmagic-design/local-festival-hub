@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { seedMassFestivals } from './mass-festivals';
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import path from "path";
-import { isLikelyStockImage, normalizeOfficialUrl, normalizeSourceUrl, pickFestivalImage } from "../src/lib/collectors/quality";
+import { normalizeOfficialUrl, normalizeSourceUrl, pickFestivalImage } from "../src/lib/collectors/quality";
 
 const adapter = new PrismaBetterSqlite3({
   url: "file:" + path.resolve(process.cwd(), "prisma/dev.db")

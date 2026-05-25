@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { CalendarRange, Check, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { Check, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 
 export function FestivalFilters() {
   const router = useRouter();
@@ -12,13 +12,12 @@ export function FestivalFilters() {
   const currentRegion = searchParams.get("region") || "all";
   const currentCategory = searchParams.get("category") || "all";
   const currentMonth = searchParams.get("month") || "all";
-  const currentStart = searchParams.get("start") || "";
-  const currentEnd = searchParams.get("end") || "";
+  const hasDateRange = searchParams.has("start") || searchParams.has("end");
   const hasParking = searchParams.get("parking") === "true";
   const hasShuttle = searchParams.get("shuttle") === "true";
   const isPetFriendly = searchParams.get("pet") === "true";
   const isChildFriendly = searchParams.get("child") === "true";
-  const currentProgress = searchParams.get("progress") || (currentStart || currentEnd ? "all" : "active");
+  const currentProgress = searchParams.get("progress") || (hasDateRange ? "all" : "active");
 
   const regions = [
     { value: "all", label: "전국 전체" },
@@ -57,11 +56,11 @@ export function FestivalFilters() {
   ];
 
   const progressOptions = [
-    { value: "active", label: "✨ 진행 중 및 예정" },
+    { value: "active", label: "진행 중 및 예정" },
     { value: "all", label: "전체 축제 (지난 축제 포함)" },
-    { value: "ongoing", label: "🟢 진행 중" },
-    { value: "upcoming", label: "⏳ 진행 예정" },
-    { value: "ended", label: "⚫️ 종료됨" }
+    { value: "ongoing", label: "지금 진행 중" },
+    { value: "upcoming", label: "앞으로 열림" },
+    { value: "ended", label: "종료됨" }
   ];
 
   // 단일 매개변수 실시간 업데이트 함수
@@ -85,38 +84,16 @@ export function FestivalFilters() {
     router.push(`/?${params.toString()}`);
   };
 
-  const updateDateRange = (key: "start" | "end", value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value) {
-      params.set(key, value);
-      if (!searchParams.has("progress")) {
-        params.delete("progress");
-      }
-    } else {
-      params.delete(key);
-    }
-
-    router.push(`/?${params.toString()}`);
-  };
-
-  const clearDateRange = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("start");
-    params.delete("end");
-    router.push(`/?${params.toString()}`);
-  };
-
   // 모든 필터 초기화
   const handleResetFilters = () => {
     router.push("/");
   };
 
   const filterContent = (
-    <div className="space-y-7 text-sm font-semibold">
+    <div className="space-y-7 text-base font-semibold">
       {/* 1. 지역 대시보드 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-sm font-bold text-muted-foreground">지역</h5>
+        <h5 className="text-base font-extrabold text-foreground">지역</h5>
         <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto pr-1">
           {regions.map((reg) => {
             const isSelected = currentRegion === reg.value;
@@ -124,7 +101,7 @@ export function FestivalFilters() {
               <button
                 key={reg.value}
                 onClick={() => updateFilterParam("region", reg.value)}
-                className={`flex items-center justify-between px-3.5 py-2.5 text-sm min-h-[44px] font-bold border transition-all text-left rounded cursor-pointer ${
+                className={`flex min-h-12 items-center justify-between rounded-lg border px-3.5 py-3 text-left text-base font-extrabold transition-all cursor-pointer ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background border-border hover:bg-secondary/40 text-foreground"
@@ -140,7 +117,7 @@ export function FestivalFilters() {
 
       {/* 개최 월별 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-sm font-bold text-muted-foreground">개최 월</h5>
+        <h5 className="text-base font-extrabold text-foreground">개최 월</h5>
         <div className="grid grid-cols-4 gap-1.5">
           {months.map((m) => {
             const isSelected = currentMonth === m.value;
@@ -148,7 +125,7 @@ export function FestivalFilters() {
               <button
                 key={m.value}
                 onClick={() => updateFilterParam("month", m.value)}
-                className={`flex items-center justify-center py-2.5 text-sm min-h-[44px] font-bold border transition-all rounded cursor-pointer ${
+                className={`flex min-h-12 items-center justify-center rounded-lg border py-3 text-base font-extrabold transition-all cursor-pointer ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background border-border hover:bg-secondary/40 text-foreground"
@@ -161,49 +138,9 @@ export function FestivalFilters() {
         </div>
       </div>
 
-      {/* 원하는 날짜 범위 필터 */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <h5 className="flex items-center gap-1.5 text-sm font-bold text-muted-foreground">
-            <CalendarRange size={16} className="text-primary" />
-            <span>날짜 범위</span>
-          </h5>
-          {(currentStart || currentEnd) && (
-            <button
-              type="button"
-              onClick={clearDateRange}
-              className="inline-flex min-h-9 items-center gap-1 rounded border border-border bg-background px-2.5 text-xs font-bold text-muted-foreground transition hover:text-foreground"
-            >
-              <X size={14} />
-              지우기
-            </button>
-          )}
-        </div>
-        <div className="grid grid-cols-1 gap-2">
-          <label className="space-y-1.5">
-            <span className="block text-xs font-bold text-muted-foreground">시작일</span>
-            <input
-              type="date"
-              value={currentStart}
-              onChange={(e) => updateDateRange("start", e.target.value)}
-              className="h-12 w-full rounded border border-border bg-background px-3 text-base font-bold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
-            />
-          </label>
-          <label className="space-y-1.5">
-            <span className="block text-xs font-bold text-muted-foreground">종료일</span>
-            <input
-              type="date"
-              value={currentEnd}
-              onChange={(e) => updateDateRange("end", e.target.value)}
-              className="h-12 w-full rounded border border-border bg-background px-3 text-base font-bold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
-            />
-          </label>
-        </div>
-      </div>
-
       {/* 2. 카테고리별 아날로그 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-sm font-bold text-muted-foreground">분야</h5>
+        <h5 className="text-base font-extrabold text-foreground">분야</h5>
         <div className="flex flex-col space-y-1.5">
           {categories.map((cat) => {
             const isSelected = currentCategory === cat.value;
@@ -211,7 +148,7 @@ export function FestivalFilters() {
               <button
                 key={cat.value}
                 onClick={() => updateFilterParam("category", cat.value)}
-                className={`flex items-center justify-between px-3.5 py-3 text-sm min-h-[44px] font-bold border transition-all text-left rounded cursor-pointer ${
+                className={`flex min-h-12 items-center justify-between rounded-lg border px-3.5 py-3 text-left text-base font-extrabold transition-all cursor-pointer ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background border-border hover:bg-secondary/40 text-foreground"
@@ -227,7 +164,7 @@ export function FestivalFilters() {
 
       {/* 진행 상태 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-sm font-bold text-muted-foreground">진행 상태</h5>
+        <h5 className="text-base font-extrabold text-foreground">진행 상태</h5>
         <div className="flex flex-col space-y-1.5">
           {progressOptions.map((prog) => {
             const isSelected = currentProgress === prog.value;
@@ -235,7 +172,7 @@ export function FestivalFilters() {
               <button
                 key={prog.value}
                 onClick={() => updateFilterParam("progress", prog.value)}
-                className={`flex items-center justify-between px-3.5 py-3 text-sm min-h-[44px] font-bold border transition-all text-left rounded cursor-pointer ${
+                className={`flex min-h-12 items-center justify-between rounded-lg border px-3.5 py-3 text-left text-base font-extrabold transition-all cursor-pointer ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background border-border hover:bg-secondary/40 text-foreground"
@@ -251,7 +188,7 @@ export function FestivalFilters() {
 
       {/* 3. 편의/옵션 다차원 필터 */}
       <div className="space-y-2.5">
-        <h5 className="text-sm font-bold text-muted-foreground">편의정보</h5>
+        <h5 className="text-base font-extrabold text-foreground">편의정보</h5>
         <div className="space-y-2">
           {[
             { key: "parking", val: hasParking, label: "주차공간 제공" },
@@ -262,13 +199,13 @@ export function FestivalFilters() {
             return (
               <label
                 key={opt.key}
-                className="flex items-center space-x-2.5 px-3.5 py-3 min-h-[44px] bg-background border border-border rounded hover:bg-secondary/40 transition-colors text-sm font-bold cursor-pointer"
+                className="flex min-h-13 items-center space-x-3 rounded-lg border border-border bg-background px-3.5 py-3 text-base font-extrabold transition-colors hover:bg-secondary/40 cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={opt.val}
                   onChange={(e) => updateFilterParam(opt.key, e.target.checked)}
-                  className="h-5 w-5 rounded-sm border-border text-primary focus:ring-primary/20 cursor-pointer"
+                  className="h-6 w-6 rounded-sm border-border text-primary focus:ring-primary/20 cursor-pointer"
                 />
                 <span>{opt.label}</span>
               </label>
@@ -280,7 +217,7 @@ export function FestivalFilters() {
 
       {/* 4. 초기화 액션 */}
       <button 
-        className="w-full text-base font-bold h-12 press-button cursor-pointer flex items-center justify-center rounded-xl" 
+        className="w-full h-14 cursor-pointer rounded-lg text-lg font-extrabold press-button flex items-center justify-center" 
         onClick={handleResetFilters}
       >
         <RotateCcw size={16} className="mr-1.5 shrink-0" />
@@ -305,13 +242,13 @@ export function FestivalFilters() {
       </aside>
 
       {/* 모바일 하단 플로팅 필터 트리거 */}
-      <div className="lg:hidden fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] right-3 z-40">
+      <div className="mb-5 w-full lg:hidden">
         <button
           onClick={() => (document.getElementById("filter-dialog") as HTMLDialogElement)?.showModal()}
-          className="rounded-xl shadow-2xl bg-primary text-primary-foreground font-bold flex items-center space-x-1.5 px-4 py-3 text-base h-12 border border-primary hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          className="flex h-14 w-full cursor-pointer items-center justify-center space-x-2 rounded-lg border border-primary bg-primary px-4 py-3 text-lg font-extrabold text-primary-foreground shadow-sm transition-all active:scale-[0.99]"
         >
-          <SlidersHorizontal size={18} />
-          <span>필터</span>
+          <SlidersHorizontal size={22} />
+          <span>상세 조건 열기</span>
         </button>
       </div>
 
@@ -323,13 +260,13 @@ export function FestivalFilters() {
         <div className="flex flex-col h-full">
           {/* 드로어 헤더 */}
           <div className="flex items-center justify-between pb-4 border-b border-border/40 mb-5">
-            <h4 className="text-base font-extrabold flex items-center space-x-1.5 font-serif text-foreground">
-              <SlidersHorizontal size={20} className="text-primary" />
+            <h4 className="text-lg font-extrabold flex items-center space-x-2 text-foreground">
+              <SlidersHorizontal size={22} className="text-primary" />
               <span>상세 조건 필터</span>
             </h4>
             <button
               onClick={() => (document.getElementById("filter-dialog") as HTMLDialogElement)?.close()}
-              className="h-10 w-10 rounded bg-secondary flex items-center justify-center font-bold text-muted-foreground hover:text-foreground active:scale-90 transition-transform cursor-pointer"
+              className="h-12 w-12 rounded-lg bg-secondary flex items-center justify-center font-bold text-muted-foreground hover:text-foreground active:scale-90 transition-transform cursor-pointer"
               aria-label="필터 닫기"
             >
               <X size={20} />

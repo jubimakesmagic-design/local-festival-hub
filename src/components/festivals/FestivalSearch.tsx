@@ -3,7 +3,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { CalendarRange, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 
 export function FestivalSearch() {
@@ -11,6 +11,8 @@ export function FestivalSearch() {
   const searchParams = useSearchParams();
   
   const q = searchParams.get("q") || "";
+  const currentStart = searchParams.get("start") || "";
+  const currentEnd = searchParams.get("end") || "";
   const [value, setValue] = useState(q);
   const [prevQ, setPrevQ] = useState(q);
 
@@ -33,25 +35,96 @@ export function FestivalSearch() {
     router.push(`/?${params.toString()}`);
   };
 
+  const updateDateRange = (key: "start" | "end", nextValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextValue) {
+      params.set(key, nextValue);
+      if (!searchParams.has("progress")) {
+        params.delete("progress");
+      }
+    } else {
+      params.delete(key);
+    }
+
+    router.push(`/?${params.toString()}`);
+  };
+
+  const clearDateRange = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("start");
+    params.delete("end");
+    router.push(`/?${params.toString()}`);
+  };
+
   return (
-    <form onSubmit={handleSearchSubmit} className="relative w-full">
-      <Input
-        type="search"
-        enterKeyHint="search"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="축제 이름, 지역 검색"
-        className="pl-11 pr-20 bg-background/50 border-border/80 !h-12 !text-base sm:!h-14 sm:pr-24"
-      />
-      <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-muted-foreground/60">
-        <Search size={19} />
+    <div className="w-full space-y-4">
+      <div className="rounded-lg border border-border bg-background p-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-base font-extrabold text-foreground">
+            <CalendarRange size={20} className="text-primary" />
+            <span>언제 가시나요?</span>
+          </div>
+          {(currentStart || currentEnd) && (
+            <button
+              type="button"
+              onClick={clearDateRange}
+              className="inline-flex min-h-10 items-center gap-1 rounded border border-border bg-card px-3 text-sm font-bold text-muted-foreground transition hover:text-foreground"
+            >
+              <X size={15} />
+              지우기
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="space-y-2">
+            <span className="block text-base font-extrabold text-foreground">시작일</span>
+            <input
+              type="date"
+              value={currentStart}
+              onChange={(e) => updateDateRange("start", e.target.value)}
+              className="h-14 w-full rounded-lg border-2 border-border bg-card px-4 text-lg font-extrabold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+            />
+          </label>
+          <label className="space-y-2">
+            <span className="block text-base font-extrabold text-foreground">종료일</span>
+            <input
+              type="date"
+              value={currentEnd}
+              onChange={(e) => updateDateRange("end", e.target.value)}
+              className="h-14 w-full rounded-lg border-2 border-border bg-card px-4 text-lg font-extrabold text-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+            />
+          </label>
+        </div>
       </div>
-      <button
-        type="submit"
-        className="absolute right-1.5 top-1.5 h-10 px-3.5 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-all cursor-pointer sm:right-2 sm:top-2 sm:px-5 sm:text-base"
-      >
-        검색
-      </button>
-    </form>
+
+      <form onSubmit={handleSearchSubmit} className="space-y-2">
+        <label className="block text-base font-extrabold text-foreground" htmlFor="festival-keyword">
+          축제 이름 또는 지역
+        </label>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+          <div className="relative">
+            <Input
+              id="festival-keyword"
+              type="search"
+              enterKeyHint="search"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="예: 강릉, 꽃축제"
+              className="pl-12 bg-background border-border !h-14 !rounded-lg !border-2 !text-lg !font-bold"
+            />
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground">
+              <Search size={22} />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="h-14 rounded-lg bg-primary px-6 text-lg font-extrabold text-primary-foreground transition hover:bg-primary/90 cursor-pointer"
+          >
+            검색하기
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

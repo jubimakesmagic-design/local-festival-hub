@@ -18,17 +18,18 @@ export function FestivalSort() {
   };
 
   return (
-    <div className="w-full sm:w-56">
+    <label className="block w-full space-y-2 sm:w-60">
+      <span className="block text-base font-extrabold text-foreground md:hidden">정렬 방식</span>
       <Select 
         value={currentSort} 
         onChange={handleSortChange} 
-        className="bg-card border-border/80 text-base font-bold h-14 py-3 shadow-sm"
+        className="h-14 rounded-lg border-2 border-border bg-card py-3 text-lg font-extrabold shadow-sm"
       >
-        <option value="trust">⭐ 신뢰도 높은 순</option>
-        <option value="newest">🆕 최근 등록순</option>
-        <option value="date">📅 축제 시작일순</option>
-        <option value="views">🔥 조회 인기순</option>
+        <option value="trust">신뢰도 높은 순</option>
+        <option value="newest">최근 등록순</option>
+        <option value="date">축제 시작일순</option>
+        <option value="views">조회 인기순</option>
       </Select>
-    </div>
+    </label>
   );
 }
