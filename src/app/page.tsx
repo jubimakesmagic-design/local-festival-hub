@@ -4,9 +4,10 @@ import { FestivalCard } from "@/components/festivals/FestivalCard";
 import { FestivalFilters } from "@/components/festivals/FestivalFilters";
 import { FestivalSearch } from "@/components/festivals/FestivalSearch";
 import { FestivalSort } from "@/components/festivals/FestivalSort";
-import { CalendarDays, CheckCircle2, Database, Map } from "lucide-react";
+import { CalendarDays, CheckCircle2, Database, Map, MapPin } from "lucide-react";
 import { Suspense } from "react";
 import { Prisma } from "@prisma/client";
+import { getFestivalNow, parseKoreaDateInput } from "@/lib/dates";
 
 export interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -87,16 +88,11 @@ export default async function Home({ searchParams }: PageProps) {
   }
 
   // 6. 날짜 범위 필터 (선택한 기간과 축제 기간이 하루라도 겹치면 노출)
-  const parseDateInput = (value: string, endOfDay = false) => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-    return new Date(`${value}T${endOfDay ? "23:59:59" : "00:00:00"}+09:00`);
-  };
-
-  const parsedStart = parseDateInput(rangeStart);
-  const parsedEnd = parseDateInput(rangeEnd, true);
+  const parsedStart = parseKoreaDateInput(rangeStart);
+  const parsedEnd = parseKoreaDateInput(rangeEnd, true);
   if (parsedStart || parsedEnd) {
-    let searchStart = parsedStart ?? parseDateInput(rangeEnd)!;
-    let searchEnd = parsedEnd ?? parseDateInput(rangeStart, true)!;
+    let searchStart = parsedStart ?? parseKoreaDateInput(rangeEnd)!;
+    let searchEnd = parsedEnd ?? parseKoreaDateInput(rangeStart, true)!;
 
     if (searchStart > searchEnd) {
       [searchStart, searchEnd] = [searchEnd, searchStart];
@@ -112,19 +108,19 @@ export default async function Home({ searchParams }: PageProps) {
   // 날짜 범위 검색 중에는 기본값을 전체로 두어 과거 날짜도 검색 가능합니다.
   const progressDefault = parsedStart || parsedEnd ? "all" : "active";
   const progress = typeof resolvedParams.progress === "string" ? resolvedParams.progress : progressDefault;
-  const demoToday = new Date("2026-05-25T17:39:43+09:00");
+  const today = getFestivalNow();
 
   if (progress === "active") {
-    andConditions.push({ endDate: { gte: demoToday } });
+    andConditions.push({ endDate: { gte: today } });
   } else if (progress === "ongoing") {
     andConditions.push({
-      startDate: { lte: demoToday },
-      endDate: { gte: demoToday },
+      startDate: { lte: today },
+      endDate: { gte: today },
     });
   } else if (progress === "upcoming") {
-    andConditions.push({ startDate: { gt: demoToday } });
+    andConditions.push({ startDate: { gt: today } });
   } else if (progress === "ended") {
-    andConditions.push({ endDate: { lt: demoToday } });
+    andConditions.push({ endDate: { lt: today } });
   }
 
   if (andConditions.length > 0) {
@@ -151,7 +147,7 @@ export default async function Home({ searchParams }: PageProps) {
   });
   // 실시간 라이브 통계 추출
   const totalCount = festivals.length;
-  const now = new Date();
+  const now = getFestivalNow();
   const activeCount = festivals.filter(f => {
     const start = new Date(f.startDate);
     const end = new Date(f.endDate);
@@ -161,25 +157,23 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-3 py-5 pb-24 md:px-6 md:py-10 md:pb-10">
-        
-        <section className="hidden md:block mb-5 rounded-lg border border-border bg-card p-4 shadow-sm md:mb-8 md:p-7">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-sm font-bold text-primary">
-                <Database size={16} />
-                전국 축제 통합 수집
+      <div className="container mx-auto max-w-7xl px-4 py-6 pb-24 md:px-6 md:py-8 md:pb-10">
+        <section className="mb-5 border-b border-border pb-5 md:mb-6 md:pb-6">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="max-w-3xl">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-primary">
+                <MapPin size={16} className="shrink-0" />
+                <span>전국 로컬 축제 안내</span>
               </div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-foreground md:text-4xl leading-tight">
-                공식 출처와 실제 이미지를 우선한 축제 탐색
-                믿을 수 있는 축제 정보만 모았습니다
+              <h1 className="text-2xl font-bold leading-tight tracking-normal text-foreground md:text-3xl">
+                날짜와 지역에 맞는 동네축제를 찾아보세요
               </h1>
-              <p className="text-[0.95rem] leading-7 text-muted-foreground md:text-base">
-                한국관광공사, 지자체, 지역 언론, 사용자 제보를 교차 수집하고 깨진 출처와 범용 스톡 이미지는 걸러냅니다.
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+                공식 출처가 확인된 축제 정보를 기준으로 기간, 지역, 편의 조건을 빠르게 좁힐 수 있습니다.
               </p>
             </div>
 
-             <div className="grid w-full grid-cols-3 gap-2 md:w-auto md:min-w-[400px] md:gap-3">
+            <div className="grid grid-cols-3 gap-2 lg:min-w-[360px]">
               {[
                 { label: "검색 결과", value: totalCount, icon: Database },
                 { label: "진행 중", value: activeCount, icon: CalendarDays },
@@ -187,12 +181,12 @@ export default async function Home({ searchParams }: PageProps) {
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={stat.label} className="flex min-h-24 flex-col items-start justify-between gap-2 rounded-lg border border-border bg-background p-3 md:justify-center md:gap-3 md:p-4">
-                    <div className="flex items-center gap-1.5">
-                      <Icon size={18} className="text-primary shrink-0" />
-                      <span className="block text-xs font-bold leading-snug text-muted-foreground md:text-sm">{stat.label}</span>
+                  <div key={stat.label} className="min-h-20 rounded-lg border border-border bg-card p-3 shadow-sm">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Icon size={16} className="shrink-0 text-primary" />
+                      <span className="text-xs font-medium leading-snug md:text-sm">{stat.label}</span>
                     </div>
-                    <strong className="block text-xl font-extrabold text-foreground md:text-2xl">{stat.value}개</strong>
+                    <strong className="mt-2 block text-xl font-bold text-foreground md:text-2xl">{stat.value}개</strong>
                   </div>
                 );
               })}
@@ -200,22 +194,16 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        <section className="mb-5 rounded-lg border border-border bg-card p-4 shadow-sm md:mb-6 md:p-5">
-          <div className="mb-4 space-y-1 md:hidden">
-            <h1 className="text-2xl font-extrabold leading-tight text-foreground">축제 찾기</h1>
-            <p className="text-base font-bold leading-7 text-muted-foreground">
-              날짜와 지역을 넣고 갈 만한 축제를 찾아보세요.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-            <div className="w-full md:flex-1">
+        <section className="mb-6 rounded-lg border border-border bg-card p-3 shadow-sm md:p-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="w-full">
               <Suspense fallback={<div className="h-10 bg-muted/20 animate-pulse rounded-lg" />}>
                 <FestivalSearch />
               </Suspense>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:w-auto md:justify-end md:gap-4 shrink-0">
-              <span className="text-base font-extrabold text-foreground md:text-base shrink-0">
-                총 {totalCount}개의 축제 표시
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-end sm:justify-between lg:w-64 lg:flex-col lg:items-stretch lg:justify-end">
+              <span className="text-sm font-medium text-muted-foreground">
+                현재 조건 <strong className="font-semibold text-foreground">{totalCount}개</strong>
               </span>
               <Suspense fallback={<div className="h-10 w-48 bg-muted/20 animate-pulse rounded-lg" />}>
                 <FestivalSort />
@@ -224,17 +212,14 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        <section className="flex flex-col lg:flex-row gap-8 items-start">
-          
-          {/* 다차원 상세 필터 */}
+        <section className="flex flex-col items-start gap-6 lg:flex-row">
           <Suspense fallback={<div className="w-72 h-96 bg-muted/20 animate-pulse rounded-lg" />}>
             <FestivalFilters />
           </Suspense>
 
-          {/* 축제 카드 리스트 Grid */}
-          <div className="flex-1 w-full">
+          <div className="w-full flex-1">
             {festivals.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {festivals.map((fest) => (
                   <div key={fest.id}>
                     <FestivalCard festival={fest} />
@@ -242,14 +227,14 @@ export default async function Home({ searchParams }: PageProps) {
                 ))}
               </div>
             ) : (
-              <div className="bg-card border-2 border-dashed border-border rounded-2xl p-10 md:p-16 text-center space-y-4 max-w-md mx-auto mt-8 shadow-sm">
-                <div className="h-16 w-16 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mx-auto">
-                  <Map size={32} />
+              <div className="mx-auto mt-6 max-w-md rounded-lg border border-dashed border-border bg-card p-8 text-center shadow-sm md:p-10">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+                  <Map size={26} />
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-xl font-extrabold text-foreground font-serif">검색 결과가 없습니다</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    다른 단어로 검색하시거나 필터 선택을 줄여보세요. 유효한 공식 출처가 확인되는 대로 신속하게 최신 로컬 축제 소식을 업데이트하겠습니다.
+                <div className="mt-4 space-y-2">
+                  <h4 className="text-lg font-semibold text-foreground">검색 결과가 없습니다</h4>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    검색어를 바꾸거나 선택한 조건을 줄여보세요.
                   </p>
                 </div>
               </div>

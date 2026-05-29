@@ -1,5 +1,6 @@
 // src/components/festivals/FestivalStatusBadge.tsx
 import { Badge } from "@/components/ui/Badge";
+import { getFestivalNow } from "@/lib/dates";
 
 export interface FestivalStatusBadgeProps {
   startDate: Date;
@@ -7,8 +8,7 @@ export interface FestivalStatusBadgeProps {
 }
 
 export function FestivalStatusBadge({ startDate, endDate }: FestivalStatusBadgeProps) {
-  // 데모의 시점 일관성을 위해 현재 기준 시점을 '2026-05-25T17:39:43+09:00'로 통일합니다.
-  const now = new Date("2026-05-25T17:39:43+09:00");
+  const now = getFestivalNow();
   const start = new Date(startDate);
   const end = new Date(endDate);
 

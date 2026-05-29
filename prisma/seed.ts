@@ -832,8 +832,7 @@ async function repairSeededFestivalData() {
   });
 
   for (const festival of festivals) {
-    // pickFestivalImage는 이제 로컬 폴백이 있으면 교체, 없으면 원본(Unsplash 포함) 유지
-    const imageUrl = pickFestivalImage(festival.name, festival.imageUrl) || festival.imageUrl;
+    const imageUrl = pickFestivalImage(festival.name, festival.imageUrl) || null;
 
     await prisma.festival.update({
       where: { id: festival.id },

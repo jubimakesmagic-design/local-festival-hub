@@ -17,17 +17,72 @@ const FAKE_URL_PATTERNS = [
 
 const FESTIVAL_IMAGE_FALLBACKS: Array<{ pattern: RegExp; imageUrl: string }> = [];
 
-export function isUsableUrl(url?: string | null): url is string {
-  if (!url) return false;
-  if (/\s/.test(url)) return false;
+const PROVINCE_ALIASES: Array<[RegExp, string]> = [
+  [/^서울(특별시)?$/, "서울"],
+  [/^부산(광역시)?$/, "부산"],
+  [/^대구(광역시)?$/, "대구"],
+  [/^인천(광역시)?$/, "인천"],
+  [/^광주(광역시)?$/, "광주"],
+  [/^대전(광역시)?$/, "대전"],
+  [/^울산(광역시)?$/, "울산"],
+  [/^세종(특별자치시|시)?$/, "세종"],
+  [/^경기도$/, "경기"],
+  [/^강원(도|특별자치도)?$/, "강원"],
+  [/^충청북도$/, "충북"],
+  [/^충청남도$/, "충남"],
+  [/^전라북도|^전북특별자치도$/, "전북"],
+  [/^전라남도$/, "전남"],
+  [/^경상북도$/, "경북"],
+  [/^경상남도$/, "경남"],
+  [/^제주(도|특별자치도)?$/, "제주"]
+];
+
+function decodeHtmlEntities(value: string) {
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'");
+}
+
+export function stripHtml(value?: string | null): string | undefined {
+  if (!value) return undefined;
+
+  const stripped = decodeHtmlEntities(value)
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return stripped || undefined;
+}
+
+export function normalizeUrl(url?: string | null): string | undefined {
+  const stripped = stripHtml(url);
+  if (!stripped) return undefined;
+
+  const extracted = stripped.match(/https?:\/\/[^\s"'<>]+/i)?.[0] || stripped;
+  const withProtocol = extracted.startsWith("www.") ? `https://${extracted}` : extracted;
+
+  if (/\s/.test(withProtocol)) return undefined;
 
   try {
-    const parsed = new URL(url);
-    if (!["http:", "https:"].includes(parsed.protocol)) return false;
-    return !FAKE_URL_PATTERNS.some((pattern) => pattern.test(url));
+    const parsed = new URL(withProtocol);
+    if (!["http:", "https:"].includes(parsed.protocol)) return undefined;
+    parsed.hash = "";
+
+    const normalized = parsed.toString();
+    if (FAKE_URL_PATTERNS.some((pattern) => pattern.test(normalized))) return undefined;
+
+    return normalized;
   } catch {
-    return false;
+    return undefined;
   }
+}
+
+export function isUsableUrl(url?: string | null): url is string {
+  return !!normalizeUrl(url);
 }
 
 export function isLikelyStockImage(url?: string | null): boolean {
@@ -43,8 +98,9 @@ export function isLikelyStockImage(url?: string | null): boolean {
 
 export function pickFestivalImage(name: string, imageUrl?: string | null): string | undefined {
   // 실제 공식 이미지(비-스톡)가 있으면 우선 사용
-  if (imageUrl && !isLikelyStockImage(imageUrl)) {
-    return imageUrl;
+  const normalizedImageUrl = normalizeUrl(imageUrl);
+  if (normalizedImageUrl && !isLikelyStockImage(normalizedImageUrl)) {
+    return normalizedImageUrl;
   }
 
   // 로컬 폴백 매핑이 있으면 교체
@@ -53,19 +109,32 @@ export function pickFestivalImage(name: string, imageUrl?: string | null): strin
     return localFallback;
   }
 
-  // 로컬 폴백이 없으면 기존 이미지(Unsplash 포함)를 유지
-  return imageUrl || undefined;
+  // 범용 스톡 이미지는 실제 축제 이미지로 오인될 수 있어 저장하지 않습니다.
+  return undefined;
 }
 
 export function normalizeOfficialUrl(url?: string | null): string | undefined {
-  if (!isUsableUrl(url)) return undefined;
-  return url;
+  return normalizeUrl(url);
 }
 
 export function normalizeSourceUrl(sourceUrl: string | undefined, officialUrl?: string | null): string {
-  if (isUsableUrl(sourceUrl)) return sourceUrl;
-  if (isUsableUrl(officialUrl)) return officialUrl;
-  return "https://korean.visitkorea.or.kr/main/fes_main.do";
+  return normalizeUrl(sourceUrl) || normalizeUrl(officialUrl) || "";
+}
+
+export function normalizeRegion(region?: string | null): string {
+  const value = stripHtml(region)?.replace(/\s+/g, " ").trim();
+  if (!value) return "전국";
+
+  const parts = value.split(" ");
+  const province = parts[0];
+  const district = parts[1];
+  const normalizedProvince = PROVINCE_ALIASES.find(([pattern]) => pattern.test(province))?.[1] || province;
+
+  if (!district || normalizedProvince === district) {
+    return normalizedProvince;
+  }
+
+  return `${normalizedProvince} ${district}`;
 }
 
 /** 카테고리별 기본 폴백 이미지 (이미지가 전혀 없는 축제용) */
@@ -85,6 +154,10 @@ export function normalizeCollectedFestival(item: CollectedFestival): CollectedFe
 
   return {
     ...item,
+    name: stripHtml(item.name) || item.name.trim(),
+    description: stripHtml(item.description),
+    region: normalizeRegion(item.region),
+    address: stripHtml(item.address),
     officialUrl,
     sourceUrl,
     imageUrl

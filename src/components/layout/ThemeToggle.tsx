@@ -36,24 +36,21 @@ export function ThemeToggle() {
     }
   };
 
-  // SSR Hydration 에러 방지용 플레이스홀더
   if (!mounted) {
-    return <div className="w-11 h-11 border border-dashed border-border rounded-xl animate-pulse" />;
+    return <div className="h-10 w-10 animate-pulse rounded-lg border border-border" />;
   }
 
   return (
     <button
       onClick={toggleTheme}
-      className="h-11 w-11 rounded-xl border border-dashed border-border/80 bg-card hover:bg-secondary/40 text-foreground flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm"
-      title={theme === "light" ? "밤 축제 모드로 변경 (다크)" : "낮 축제 모드로 변경 (라이트)"}
+      className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-secondary/60"
+      title={theme === "light" ? "어두운 화면으로 보기" : "밝은 화면으로 보기"}
     >
-      <div className="relative w-5 h-5 flex items-center justify-center transition-transform duration-500 group-hover:rotate-45">
-        {theme === "light" ? (
-          <Moon size={18} className="text-primary shrink-0 transition-all duration-300" />
-        ) : (
-          <Sun size={18} className="text-accent shrink-0 transition-all duration-300" />
-        )}
-      </div>
+      {theme === "light" ? (
+        <Moon size={18} className="shrink-0 text-muted-foreground" />
+      ) : (
+        <Sun size={18} className="shrink-0 text-accent" />
+      )}
     </button>
   );
 }

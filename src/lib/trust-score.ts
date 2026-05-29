@@ -6,6 +6,10 @@ export interface TrustScoreParams {
   hasDate: boolean;
   hasAddress: boolean;
   hasParkingOrShuttle: boolean;
+  hasUsableSourceUrl?: boolean;
+  sourceCount?: number;
+  hasDescription?: boolean;
+  hasRealImage?: boolean;
 }
 
 /**
@@ -28,18 +32,25 @@ export interface TrustScoreParams {
  */
 export function calculateTrustScore(params: TrustScoreParams): number {
   let score = 50;
+  const uniqueSourceTypes = Array.from(new Set(params.sourceTypes));
+  const sourceCount = params.sourceCount ?? uniqueSourceTypes.length;
+  const hasUsableSourceUrl = params.hasUsableSourceUrl ?? sourceCount > 0;
 
   // --- 가산 조건 ---
   if (params.hasOfficialUrl) {
     score += 20;
   }
   
-  if (params.sourceTypes.includes("LOCAL_GOV") || params.sourceTypes.includes("VISIT_KOREA")) {
+  if (uniqueSourceTypes.includes("LOCAL_GOV") || uniqueSourceTypes.includes("VISIT_KOREA")) {
     score += 15;
   }
   
-  if (params.sourceTypes.includes("NEWS")) {
+  if (uniqueSourceTypes.includes("NEWS")) {
     score += 10;
+  }
+
+  if (sourceCount >= 2) {
+    score += 8;
   }
   
   if (params.hasDate) {
@@ -54,10 +65,18 @@ export function calculateTrustScore(params: TrustScoreParams): number {
     score += 5;
   }
 
+  if (params.hasDescription) {
+    score += 4;
+  }
+
+  if (params.hasRealImage) {
+    score += 3;
+  }
+
   // --- 감산 조건 ---
-  const isOnlyUserSubmitted = params.sourceTypes.length === 1 && params.sourceTypes[0] === "USER_SUBMIT";
+  const isOnlyUserSubmitted = uniqueSourceTypes.length === 1 && uniqueSourceTypes[0] === "USER_SUBMIT";
   if (isOnlyUserSubmitted) {
-    score -= 15;
+    score -= 20;
   }
 
   if (!params.hasOfficialUrl) {
@@ -68,7 +87,11 @@ export function calculateTrustScore(params: TrustScoreParams): number {
     score -= 20;
   }
 
-  if (params.sourceTypes.length === 0) {
+  if (!hasUsableSourceUrl) {
+    score -= 15;
+  }
+
+  if (uniqueSourceTypes.length === 0) {
     score -= 20;
   }
 

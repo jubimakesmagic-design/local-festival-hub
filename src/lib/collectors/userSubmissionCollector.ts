@@ -1,6 +1,8 @@
 // lib/collectors/userSubmissionCollector.ts
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
 import { db } from "../db";
+import { parseDateRangeInput } from "@/lib/dates";
+import { normalizeCollectedFestival } from "./quality";
 
 export class UserSubmissionCollector implements FestivalCollector {
   sourceName = "사용자 다이렉트 제보 및 검수망";
@@ -18,23 +20,21 @@ export class UserSubmissionCollector implements FestivalCollector {
         }
       });
 
-      return submissions.map(sub => {
-        // 날짜 파싱 (기본값 설정)
-        let startDate = new Date();
-        let endDate = new Date();
-        if (sub.dateRange && sub.dateRange.includes("~")) {
-          const parts = sub.dateRange.split("~").map(p => p.trim());
-          if (parts[0]) startDate = new Date(parts[0]);
-          if (parts[1]) endDate = new Date(parts[1]);
+      return submissions.flatMap(sub => {
+        const parsedRange = parseDateRangeInput(sub.dateRange);
+
+        if (!parsedRange) {
+          console.warn(`[UserSubmissionCollector] 날짜 형식이 잘못되어 제외: ${sub.name}`);
+          return [];
         }
 
-        return {
+        return normalizeCollectedFestival({
           name: sub.name,
           description: sub.description || undefined,
           region: sub.region,
           address: sub.address || undefined,
-          startDate,
-          endDate,
+          startDate: parsedRange.startDate,
+          endDate: parsedRange.endDate,
           category: (sub.category as "FOOD" | "CULTURE" | "ART" | "MUSIC" | "NATURE" | "OTHER") || "OTHER",
           officialUrl: sub.sourceUrl || undefined,
           hasParking: false,
@@ -43,7 +43,7 @@ export class UserSubmissionCollector implements FestivalCollector {
           isChildFriendly: true,
           sourceName: `${sub.submitterEmail || "익명 제보자"} 제보`,
           sourceUrl: sub.sourceUrl || ""
-        };
+        });
       });
     } catch (e) {
       console.error("[UserSubmissionCollector] DB 조회 에러 (폴백 모드 전환)", e);

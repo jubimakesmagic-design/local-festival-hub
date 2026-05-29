@@ -18,12 +18,12 @@ export function FestivalSort() {
   };
 
   return (
-    <label className="block w-full space-y-2 sm:w-60">
-      <span className="block text-base font-extrabold text-foreground md:hidden">정렬 방식</span>
+    <label className="block w-full space-y-2">
+      <span className="block text-sm font-semibold text-foreground lg:hidden">정렬</span>
       <Select 
         value={currentSort} 
         onChange={handleSortChange} 
-        className="h-14 rounded-lg border-2 border-border bg-card py-3 text-lg font-extrabold shadow-sm"
+        className="h-12 rounded-lg border-border bg-background py-3 text-base font-medium shadow-sm"
       >
         <option value="trust">신뢰도 높은 순</option>
         <option value="newest">최근 등록순</option>

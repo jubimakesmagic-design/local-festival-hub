@@ -17,31 +17,25 @@ export default async function AdminPage() {
   });
 
   return (
-    <div className="min-h-screen py-10 relative bg-background">
-
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        
-        {/* 상단 관리자 안내 헤더 - 다이어리 검수 대장 */}
-        <section className="mb-10 text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 border border-dashed border-rose-500/40 text-rose-500 text-xs font-bold stamp-badge uppercase font-typewriter">
+    <div className="relative min-h-screen bg-background py-10">
+      <div className="container relative z-10 mx-auto px-4 md:px-6">
+        <section className="mx-auto mb-8 max-w-2xl space-y-3 text-center">
+          <div className="inline-flex items-center space-x-1.5 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400">
             <ShieldAlert size={12} className="shrink-0" />
-            <span>ARCHIVE AUDIT CENTRE</span>
+            <span>관리자</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground font-serif">
-            기록 검수 대장
+          <h2 className="text-2xl font-bold tracking-normal text-foreground md:text-3xl">
+            제보 및 축제 관리
           </h2>
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto font-medium">
-            동네 탐험대원들로부터 접수된 소박한 누락 제보 기록을 하나씩 고찰·심사하고, 등록된 소규모 축제들의 현지 정보 신뢰지수를 엄밀히 재계산하여 기록첩에 등재합니다.
+          <p className="mx-auto max-w-md text-sm font-medium leading-6 text-muted-foreground">
+            접수된 제보를 검토하고 등록된 축제의 신뢰도 점수를 조정합니다.
           </p>
           
-          {/* 간이 Bypass Auth 배너 */}
-          <div className="max-w-md mx-auto p-3.5 border border-primary/30 bg-secondary/50 text-[10px] text-primary font-bold leading-relaxed shadow-sm rounded font-typewriter uppercase">
-            🛡️ DEMO MODE: AUTHENTICATION BYPASSED FOR TESTING
+          <div className="mx-auto max-w-md rounded-lg border border-primary/20 bg-secondary/50 p-3 text-xs font-medium leading-5 text-primary shadow-sm">
+            데모 환경에서는 관리자 인증이 생략되어 있습니다.
           </div>
         </section>
 
-
-        {/* 클라이언트 사이드 대시보드 인터페이스 마운트 */}
         <AdminDashboardClient 
           initialSubmissions={JSON.parse(JSON.stringify(submissions))} 
           initialFestivals={JSON.parse(JSON.stringify(festivals))} 

@@ -1,6 +1,7 @@
 // lib/collectors/visitKoreaCollector.ts
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
-import { normalizeCollectedFestival } from "./quality";
+import { normalizeCollectedFestival, stripHtml } from "./quality";
+import { parseTourApiDate } from "@/lib/dates";
 
 interface TourApiItem {
   title?: string;
@@ -96,7 +97,7 @@ export class VisitKoreaCollector implements FestivalCollector {
       // 단일 객체로 넘어올 경우 배열로 감싸줍니다.
       const rawList = Array.isArray(items) ? items : [items];
       
-      const festivals: CollectedFestival[] = await Promise.all(rawList.map(async (rawItem: unknown) => {
+      const festivals = await Promise.all(rawList.map(async (rawItem: unknown): Promise<CollectedFestival | null> => {
         const item = rawItem as TourApiItem;
         const title = item.title || "이름 없는 축제";
         const addr = item.addr1 || "";
@@ -107,8 +108,12 @@ export class VisitKoreaCollector implements FestivalCollector {
         const image = item.firstimage || item.firstimage2;
         
         // 날짜 파싱 (YYYYMMDD)
-        const startDate = this.parseYYYYMMDD(item.eventstartdate, false);
-        const endDate = this.parseYYYYMMDD(item.eventenddate, true);
+        const startDate = parseTourApiDate(item.eventstartdate, false);
+        const endDate = parseTourApiDate(item.eventenddate || item.eventstartdate, true);
+        if (!startDate || !endDate) {
+          console.warn(`[VisitKoreaCollector] 날짜가 불명확하여 제외: ${title}`);
+          return null;
+        }
         
         // 카테고리 지능형 분류 및 지역 추출
         const category = this.determineCategory(title);
@@ -136,7 +141,7 @@ export class VisitKoreaCollector implements FestivalCollector {
       console.log(`[VisitKoreaCollector] API 호출 성공 및 ${festivals.length}건 변환 완료.`);
 
       // 필터 적용 필터링
-      return festivals.filter(item => {
+      return festivals.filter((item): item is CollectedFestival => !!item).filter(item => {
         if (params.region && !item.region.includes(params.region)) return false;
         if (params.category && item.category !== params.category) return false;
         return true;
@@ -186,9 +191,9 @@ export class VisitKoreaCollector implements FestivalCollector {
       const introItem = this.firstApiItem(intro) as TourApiItem | undefined;
 
       return {
-        homepage: this.stripHtml(commonItem?.homepage),
-        overview: this.stripHtml(commonItem?.overview),
-        parking: this.stripHtml(introItem?.parking)
+        homepage: stripHtml(commonItem?.homepage),
+        overview: stripHtml(commonItem?.overview),
+        parking: stripHtml(introItem?.parking)
       };
     } catch {
       return {};
@@ -199,30 +204,6 @@ export class VisitKoreaCollector implements FestivalCollector {
     const responseData = data as { response?: { body?: { items?: { item?: unknown } } } };
     const item = responseData?.response?.body?.items?.item;
     return Array.isArray(item) ? item[0] : item;
-  }
-
-  private stripHtml(value?: string): string | undefined {
-    if (!value) return undefined;
-    return value
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<\/?[^>]+(>|$)/g, "")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, "\"")
-      .replace(/&#39;/g, "'")
-      .trim() || undefined;
-  }
-
-  /**
-   * YYYYMMDD 형태의 문자열을 Date 객체로 파싱합니다.
-   */
-  private parseYYYYMMDD(str?: string, isEnd = false): Date {
-    if (!str || str.length !== 8) return new Date();
-    const y = parseInt(str.substring(0, 4));
-    const m = parseInt(str.substring(4, 6)) - 1;
-    const d = parseInt(str.substring(6, 8));
-    return new Date(y, m, d, isEnd ? 22 : 9, 0, 0);
   }
 
   /**

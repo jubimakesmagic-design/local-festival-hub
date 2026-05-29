@@ -3,34 +3,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, MapPin, ShieldAlert } from "lucide-react";
+import { Compass, MapPin, PlusCircle, ShieldAlert } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
   const pathname = usePathname();
 
   const links = [
-    { href: "/", label: "축제 둘러보기", icon: MapPin },
-    // { href: "/submit", label: "축제 제보하기", icon: PlusCircle },
-    { href: "/admin", label: "관리자 검수", icon: ShieldAlert },
+    { href: "/", label: "둘러보기", icon: MapPin },
+    { href: "/submit", label: "제보하기", icon: PlusCircle },
+    { href: "/admin", label: "관리", icon: ShieldAlert },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md transition-all duration-300">
-      <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-        {/* 로고 영역 - 아날로그 수공예 🧭 소인 */}
-        <Link href="/" className="flex items-center space-x-2.5 group">
-          <div className="h-11 w-11 stamp-badge flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-            <Compass size={22} className="text-primary" />
+    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur-md">
+      <div className="container mx-auto flex h-15 items-center justify-between px-4 md:h-16 md:px-6">
+        <Link href="/" className="group flex min-h-11 items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-primary shadow-sm transition-colors group-hover:border-primary/40">
+            <Compass size={20} />
           </div>
-          <span className="font-extrabold text-2xl tracking-tight font-serif text-foreground">
+          <span className="text-xl font-bold tracking-normal text-foreground md:text-2xl">
             동네축제
           </span>
         </Link>
 
-        {/* 네비게이션 및 테마 스위처 */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <nav className="flex items-center space-x-1.5 sm:space-x-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <nav className="flex items-center gap-1">
             {links.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -38,19 +36,19 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center space-x-2 px-3.5 py-2.5 text-sm font-bold transition-all duration-200 border border-dashed rounded-xl min-h-[44px] ${
+                  className={`flex min-h-10 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-card text-primary border-primary/50 stamp-badge"
-                      : "text-muted-foreground border-transparent hover:border-border hover:bg-secondary/40 hover:text-foreground"
+                      ? "border-primary/25 bg-primary/10 text-primary"
+                      : "border-transparent text-muted-foreground hover:border-border hover:bg-secondary/60 hover:text-foreground"
                   }`}
                 >
                   <Icon size={16} className="shrink-0" />
-                  <span className="hidden md:inline">{link.label}</span>
+                  <span className="hidden sm:inline">{link.label}</span>
                 </Link>
               );
             })}
           </nav>
-          <div className="border-l border-border/60 h-5 my-auto mx-1 hidden sm:block" />
+          <div className="hidden h-5 border-l border-border sm:block" />
           <ThemeToggle />
         </div>
       </div>

@@ -3,6 +3,8 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { parseDateRangeInput } from "@/lib/dates";
+import { normalizeOfficialUrl } from "@/lib/collectors/quality";
 
 export interface SubmissionFormData {
   name: string;
@@ -25,17 +27,26 @@ export async function submitFestivalAction(formData: SubmissionFormData) {
       return { success: false, error: "필수 정보를 모두 입력해주세요." };
     }
 
+    if (!parseDateRangeInput(formData.dateRange)) {
+      return { success: false, error: "행사 기간은 YYYY-MM-DD ~ YYYY-MM-DD 형식으로 입력해주세요." };
+    }
+
+    const sourceUrl = formData.sourceUrl ? normalizeOfficialUrl(formData.sourceUrl) : undefined;
+    if (formData.sourceUrl && !sourceUrl) {
+      return { success: false, error: "출처 URL은 http 또는 https로 시작하는 실제 주소여야 합니다." };
+    }
+
     const submission = await db.userSubmission.create({
       data: {
-        name: formData.name,
-        description: formData.description || null,
-        region: formData.region,
-        address: formData.address || null,
+        name: formData.name.trim(),
+        description: formData.description?.trim() || null,
+        region: formData.region.trim(),
+        address: formData.address?.trim() || null,
         dateRange: formData.dateRange,
         category: formData.category,
-        sourceUrl: formData.sourceUrl || null,
-        submitterEmail: formData.submitterEmail || null,
-        submitterContact: formData.submitterContact || null,
+        sourceUrl: sourceUrl || null,
+        submitterEmail: formData.submitterEmail?.trim() || null,
+        submitterContact: formData.submitterContact?.trim() || null,
         status: "PENDING"
       }
     });

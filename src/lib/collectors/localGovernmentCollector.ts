@@ -1,6 +1,7 @@
 // lib/collectors/localGovernmentCollector.ts
 import { FestivalCollector, CollectedFestival, CollectParams } from "./types";
 import { normalizeCollectedFestival } from "./quality";
+import { parseKoreaDateInput } from "@/lib/dates";
 
 interface GeminiFestivalResponse {
   name: string;
@@ -155,14 +156,22 @@ ${items.join("\n\n")}
 
       console.log(`[LocalGovernmentCollector] Gemini AI 정제 완료! ${parsedList.length}건의 실제 지자체 공식 행사 데이터 추출 성공.`);
 
-      const result: CollectedFestival[] = parsedList.map((item: GeminiFestivalResponse) => {
+      const result: CollectedFestival[] = parsedList.flatMap((item: GeminiFestivalResponse) => {
+        const startDate = parseKoreaDateInput(item.startDate);
+        const endDate = parseKoreaDateInput(item.endDate || item.startDate, true);
+
+        if (!startDate || !endDate) {
+          console.warn(`[LocalGovernmentCollector] 날짜가 불명확하여 제외: ${item.name}`);
+          return [];
+        }
+
         return {
           name: item.name,
           description: item.description || `${item.name}는 ${item.region} 지자체가 후원하고 개최하는 공식 문화 행사입니다.`,
           region: item.region,
           address: item.address || undefined,
-          startDate: new Date(item.startDate),
-          endDate: new Date(item.endDate),
+          startDate,
+          endDate,
           category: item.category,
           officialUrl: item.officialUrl || undefined,
           imageUrl: item.imageUrl || undefined,

@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { calculateTrustScore } from "@/lib/trust-score";
 import { syncFestivals } from "@/lib/collectors/sync";
+import { parseDateRangeInput } from "@/lib/dates";
+import { normalizeOfficialUrl } from "@/lib/collectors/quality";
 
 /**
  * 1. 사용자 제보 건을 정식 승인하여 Festival 테이블로 마이그레이션 생성합니다.
@@ -24,24 +26,24 @@ export async function approveSubmissionAction(submissionId: number, customScore?
       return { success: false, error: "이미 처리가 완료된 제보서입니다." };
     }
 
-    // 일시 문자열 파싱 ("2026-10-12 ~ 2026-10-14")
-    let startDate = new Date();
-    let endDate = new Date();
-    if (submission.dateRange && submission.dateRange.includes("~")) {
-      const parts = submission.dateRange.split("~").map(p => p.trim());
-      if (parts[0]) startDate = new Date(parts[0]);
-      if (parts[1]) endDate = new Date(parts[1]);
+    const parsedRange = parseDateRangeInput(submission.dateRange);
+    if (!parsedRange) {
+      return { success: false, error: "행사 기간 형식이 올바르지 않아 승인할 수 없습니다." };
     }
+    const normalizedSourceUrl = normalizeOfficialUrl(submission.sourceUrl);
 
     // 신뢰도 알고리즘 연동 자동 계산 (수동 입력 값이 없는 경우 적용)
     let calculatedScore = customScore;
     if (calculatedScore === undefined || calculatedScore === null) {
       calculatedScore = calculateTrustScore({
-        hasOfficialUrl: !!submission.sourceUrl,
+        hasOfficialUrl: !!normalizedSourceUrl,
         sourceTypes: ["USER_SUBMIT"],
         hasDate: !!submission.dateRange,
         hasAddress: !!submission.address,
-        hasParkingOrShuttle: false
+        hasParkingOrShuttle: false,
+        hasUsableSourceUrl: !!normalizedSourceUrl,
+        sourceCount: normalizedSourceUrl ? 1 : 0,
+        hasDescription: !!submission.description
       });
     }
 
@@ -54,10 +56,10 @@ export async function approveSubmissionAction(submissionId: number, customScore?
           description: submission.description,
           region: submission.region,
           address: submission.address,
-          startDate,
-          endDate,
+          startDate: parsedRange.startDate,
+          endDate: parsedRange.endDate,
           category: submission.category,
-          officialUrl: submission.sourceUrl || null,
+          officialUrl: normalizedSourceUrl || null,
           trustScore: calculatedScore,
           status: "VERIFIED", // 즉시 검증 배포
           views: 0
@@ -65,12 +67,12 @@ export async function approveSubmissionAction(submissionId: number, customScore?
       });
 
       // (2) 출처 링크 등록
-      if (submission.sourceUrl) {
+      if (normalizedSourceUrl) {
         await tx.festivalSource.create({
           data: {
             festivalId: festival.id,
             name: `${submission.submitterEmail || "익명 제보자"} 제보 출처`,
-            url: submission.sourceUrl,
+            url: normalizedSourceUrl,
             type: "USER_SUBMIT"
           }
         });
